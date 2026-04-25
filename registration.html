@@ -213,12 +213,13 @@
           </svg>
           Cancel
         </button>
-        <button type="button" id="bookBtn" class="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 h-16">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-          </svg>
-          Confirm Booking
-        </button>
+       <!-- Change button type from "button" to "submit" -->
+<button type="submit" id="bookBtn" class="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 h-16">
+  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+  </svg>
+  Confirm Booking
+</button>
       </div>
     </form>
   </div>
@@ -274,46 +275,91 @@
   document.querySelector('.bg-gradient-to-r').querySelector('h3').textContent = hallName;
   document.querySelector('.bg-white\\/10').textContent = selectedDate + ' • 2:00 PM - 5:00 PM';
 </script>
+<script>
+// Read data from calendar URL params
+const urlParams = new URLSearchParams(window.location.search);
+const hallName = decodeURIComponent(urlParams.get('hall') || 'Seminar Hall 2');
+const selectedDate = urlParams.get('date') || 'Thursday, April 30';
+
+// Update hall card
+document.querySelector('.bg-gradient-to-r h3').textContent = hallName;
+
+// Time validation
+const startTime = document.querySelector('[name="startTime"]');
+const endTime = document.querySelector('[name="endTime"]');
+
+function validateTimes() {
+  if (startTime.value && endTime.value && endTime.value <= startTime.value) {
+    endTime.setCustomValidity('End time must be after start time');
+    endTime.style.borderColor = '#ef4444';
+  } else {
+    endTime.setCustomValidity('');
+    endTime.style.borderColor = '';
+  }
+}
+
+startTime.addEventListener('change', validateTimes);
+endTime.addEventListener('change', validateTimes);
+</script>
+
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA1VE0YP88fk7tJ-NynBt_A0dNnoMyVi44",
-    authDomain: "hall-booking-de99d.firebaseapp.com",
-    projectId: "hall-booking-de99d",
-    storageBucket: "hall-booking-de99d.firebasestorage.app",
-    messagingSenderId: "1077560501819",
-    appId: "1:1077560501819:web:a57337c0cb22859d869e1e"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyA1VE0YP88fk7tJ-NynBt_A0dNnoMyVi44",
+  authDomain: "hall-booking-de99d.firebaseapp.com",
+  projectId: "hall-booking-de99d",
+  storageBucket: "hall-booking-de99d.firebasestorage.app",
+  messagingSenderId: "1077560501819",
+  appId: "1:1077560501819:web:a57337c0cb22859d869e1e"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  window.submitBooking = async function () {
-alert("Button clicked");
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const date = document.getElementById("date").value;
-    const hall = document.getElementById("hall").value;
+// ✅ FIXED SUBMIT FUNCTION - collects ALL form data
+async function submitBooking() {
+  // Get all form data
+  const formData = new FormData(document.getElementById('bookingForm'));
+  const data = Object.fromEntries(formData);
+  
+  // Convert equipment checkboxes to array
+  data.equipment = Array.from(formData.getAll('equipment'));
+  
+  // Add URL params and timestamp
+  data.hall = hallName;
+  data.date = selectedDate;
+  data.createdAt = new Date().toISOString();
 
-    try {
-      await addDoc(collection(db, "bookings"), {
-        name,
-        email,
-        date,
-        hall,
-        createdAt: new Date()
-      });
+  try {
+    console.log('Submitting:', data); // Debug log
+    
+    await addDoc(collection(db, "bookings"), data);
+    
+    alert(`✅ Booking confirmed successfully!\n\nHall: ${hallName}\nDate: ${selectedDate}\nCheck your email for confirmation.`);
+    
+    // Reset form
+    document.getElementById('bookingForm').reset();
+    
+  } catch (error) {
+    console.error('Firebase Error:', error);
+    alert('❌ Booking failed. Please try again.');
+  }
+}
 
-      alert("Booking successful 🎉");
-    } catch (error) {
-      console.error(error);
-      alert("Error booking");
-    }
-  };
-document.getElementById("bookBtn").addEventListener("click", submitBooking);
+// ✅ Connect to the BOOK button (change type="submit" in HTML too)
+document.getElementById('bookBtn').addEventListener('click', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  submitBooking();
+});
 
+// ✅ Also handle form submit
+document.getElementById('bookingForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  submitBooking();
+});
 </script>
   
 </body>
