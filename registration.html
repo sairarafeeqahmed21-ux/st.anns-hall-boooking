@@ -100,15 +100,15 @@
         <div class="grid md:grid-cols-2 gap-6">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-            <input type="text" name="fullName" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="John Doe" />
+            <input type="text" id="name" name="fullName" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="John Doe" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-            <input type="email" name="email" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="john@example.com" />
+            <input type="email" id="email" name="email" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="john@example.com" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
-            <input type="tel" name="phone" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="+1 (555) 123-4567" />
+            <input type="tel" id="phone" name="phone" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="+1 (555) 123-4567" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Department / Organization</label>
@@ -213,7 +213,7 @@
           </svg>
           Cancel
         </button>
-        <button type="submit" class="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 h-16">
+        <button type="button" onclick="submitbooking()" class="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 h-16">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
           </svg>
@@ -273,6 +273,44 @@
   // Update hall card
   document.querySelector('.bg-gradient-to-r').querySelector('h3').textContent = hallName;
   document.querySelector('.bg-white\\/10').textContent = selectedDate + ' • 2:00 PM - 5:00 PM';
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA1VE0YP88fk7tJ-NynBt_A0dNnoMyVi44",
+    authDomain: "hall-booking-de99d.firebaseapp.com",
+    projectId: "hall-booking-de99d",
+    storageBucket: "hall-booking-de99d.firebasestorage.app",
+    messagingSenderId: "1077560501819",
+    appId: "1:1077560501819:web:a57337c0cb22859d869e1e"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.submitBooking = async function () {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const date = document.getElementById("date").value;
+    const hall = document.getElementById("hall").value;
+
+    try {
+      await addDoc(collection(db, "bookings"), {
+        name,
+        email,
+        date,
+        hall,
+        createdAt: new Date()
+      });
+
+      alert("Booking successful 🎉");
+    } catch (error) {
+      console.error(error);
+      alert("Error booking");
+    }
+  };
 </script>
   
 </body>
