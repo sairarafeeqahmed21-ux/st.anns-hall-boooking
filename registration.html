@@ -213,7 +213,7 @@
           </svg>
           Cancel
         </button>
-        <button type="button" onclick="submitbooking()" class="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 h-16">
+        <button type="button" onclick="submitBooking()" class="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 h-16">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
           </svg>
@@ -291,6 +291,7 @@
   const db = getFirestore(app);
 
   window.submitBooking = async function () {
+alert("Button clicked");
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const date = document.getElementById("date").value;
