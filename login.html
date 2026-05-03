@@ -135,7 +135,7 @@
 
   if (!hallName) {
     alert("❌ No hall selected. Please go back and choose a hall.");
-    window.location.href = "hallbooking.html#availability";
+    window.location.href = "index.html#availability";
     throw new Error("Missing hall parameter");
   }
 
@@ -150,7 +150,7 @@
 
   if (!validHalls.includes(hallName)) {
     alert("❌ Invalid hall selected.");
-    window.location.href = "hallbooking.html#availability";
+    window.location.href = "index.html#availability";
     throw new Error("Invalid hall");
   }
 
