@@ -9,129 +9,169 @@
 <style>
   body { font-family: 'Inter', sans-serif; }
   html { scroll-behavior: smooth; }
+  
+  /* Mobile fixes */
+  @media (max-width: 768px) {
+    .hero-content { padding: 1rem !important; }
+    .right-cards { 
+      position: relative !important; 
+      right: 0 !important; 
+      bottom: 0 !important; 
+      width: 100% !important; 
+      padding: 1rem;
+    }
+    .right-cards .w-96 { width: 100% !important; max-width: 100% !important; }
+  }
 </style>
 </head>
 <body class="bg-black text-white">
-<!-- Navbar -->
-<header class="fixed top-0 left-0 w-full flex justify-between items-center px-10 py-6 z-50 bg-black/50 backdrop-blur-xl border-b border-white/10">
-  <h1 class="text-lg font-semibold">CampusHalls</h1>
-  <nav class="flex gap-8 text-gray-300 text-sm">
+<!-- Navbar - MOBILE FRIENDLY -->
+<header class="fixed top-0 left-0 w-full flex justify-between items-center px-4 md:px-10 py-4 md:py-6 z-50 bg-black/90 backdrop-blur-xl border-b border-white/10">
+  <h1 class="text-base md:text-lg font-semibold">CampusHalls</h1>
+  <nav class="hidden md:flex gap-8 text-gray-300 text-sm">
     <a href="#home" class="hover:text-white transition-colors duration-300">Home</a>
     <a href="#availability" class="hover:text-white transition-colors duration-300">Availability</a>
   </nav>
+  <!-- Mobile menu button -->
+  <button id="mobileMenuBtn" class="md:hidden text-white p-2">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+    </svg>
+  </button>
 </header>
 
-<!-- HERO SECTION -->
-<section id="home" class="relative h-screen flex items-center px-16 pt-24">
+<!-- Mobile Menu Overlay -->
+<div id="mobileMenu" class="fixed top-16 left-0 w-full bg-black/95 backdrop-blur-xl border-b border-white/10 md:hidden z-40 opacity-0 invisible transition-all duration-300">
+  <nav class="flex flex-col p-6 gap-4 text-gray-300 text-base">
+    <a href="#home" class="hover:text-white transition-colors py-2">Home</a>
+    <a href="#availability" class="hover:text-white transition-colors py-2">Availability</a>
+    <a href="login.html?hall=Seminar%20Hall%201" class="hover:text-white transition-colors py-2">📚 Seminar Hall 1</a>
+    <a href="login.html?hall=Seminar%20Hall%202" class="hover:text-white transition-colors py-2">📖 Seminar Hall 2</a>
+    <a href="login.html?hall=Main%20Auditorium" class="hover:text-white transition-colors py-2">🎭 Main Auditorium</a>
+  </nav>
+</div>
+
+<!-- HERO SECTION - ALL LINKS FIXED -->
+<section id="home" class="relative min-h-screen flex flex-col lg:flex-row items-center justify-center px-4 md:px-16 pt-20 md:pt-24 lg:pt-28">
   <!-- Background Image -->
   <img src="https://media.gettyimages.com/id/186826741/photo/empty-lecture-hall-with-several-rows-of-seats-and-a-screen.jpg?s=612x612&w=0&k=20&c=p_LGSVbjdY_tQoRLjP8N7FL8wYNrZ8LPdgNVypY3cJU="
   class="absolute inset-0 w-full h-full object-cover" />
   <!-- Overlay --> 
-  <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40"></div> 
+  <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/50"></div> 
   
-  <!-- Left Content --> 
-  <div class="relative max-w-xl z-10">
-    <div class="inline-flex items-center gap-2 bg-green-500/20 border border-green-500/40 px-4 py-2 rounded-full text-green-400 text-sm backdrop-blur-sm">
+  <!-- Left Content -->
+  <div class="relative z-10 w-full lg:max-w-xl order-2 lg:order-1 text-center lg:text-left">
+    <div class="inline-flex items-center gap-2 bg-green-500/20 border border-green-500/40 px-3 py-2 rounded-full text-green-400 text-sm backdrop-blur-sm mx-auto lg:mx-0 mb-4">
       <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
       Live Availability
     </div>
-    <h1 class="text-6xl font-bold leading-tight mt-6">
+    <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold leading-tight mt-4 md:mt-6">
       Book Your <br>
       <span class="text-green-400">Event Space</span><br>
       Instantly
     </h1>
-    <p class="text-gray-300 mt-6 text-lg leading-relaxed">
+    <p class="text-gray-300 mt-4 md:mt-6 text-base md:text-lg leading-relaxed max-w-md mx-auto lg:mx-0">
       Check real-time availability of our seminar halls and auditorium. 
       Book your preferred time slot in just a few clicks.
     </p>
-    <a href="#availability">
-      <button class="mt-8 bg-green-500 hover:bg-green-600 transition-all duration-300 px-8 py-4 rounded-full font-semibold shadow-xl shadow-green-500/25 hover:shadow-2xl hover:scale-105 text-lg">
-        Check Availability →
-      </button>
-    </a>
+    <div class="mt-6 md:mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+      <a href="#availability">
+        <button class="bg-green-500 hover:bg-green-600 transition-all duration-300 px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold shadow-xl shadow-green-500/25 hover:shadow-2xl hover:scale-105 text-base md:text-lg w-full sm:w-auto">
+          Check Availability →
+        </button>
+      </a>
+      <a href="login.html?hall=Seminar%20Hall%201">
+        <button class="border border-white/30 hover:border-white/50 px-6 md:px-8 py-3 md:py-4 rounded-full font-semibold hover:bg-white/10 backdrop-blur-sm transition-all duration-300 text-sm md:text-base w-full sm:w-auto text-center">
+          View Calendars
+        </button>
+      </a>
+    </div>
   </div> 
   
-  <!-- Right Cards -->
-  <div class="absolute right-16 bottom-20 space-y-4 z-10">
-    <div class="w-96 h-20 p-5 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-300 group flex items-center justify-between">
+  <!-- Right Cards - ALL LINKS FIXED -->
+  <div class="relative z-10 w-full lg:absolute lg:right-4 lg:bottom-8 lg:w-96 order-1 lg:order-2 mb-8 lg:mb-0 space-y-3 lg:space-y-4">
+    <!-- Hall 1 -->
+    <div class="w-full p-4 md:p-5 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-300 group flex items-center justify-between h-20 md:h-20">
       <div>
-        <h2 class="font-bold text-lg group-hover:text-green-400 transition-colors">Seminar Hall 1</h2>
+        <h2 class="font-bold text-base md:text-lg group-hover:text-green-400 transition-colors">Seminar Hall 1</h2>
         <p class="text-gray-400 text-xs mt-1">Capacity: 80</p>
       </div>
-      <span class="text-green-400 text-sm font-medium flex items-center gap-1">
-        ● Available Now
+      <a href="login.html?hall=Seminar%20Hall%201" class="text-green-400 text-xs md:text-sm font-medium flex items-center gap-1">
+        View Calendar
         <div class="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
-      </span>
+      </a>
     </div>
     
-    <div class="w-96 h-20 p-5 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-300 group flex items-center justify-between">
+    <!-- Hall 2 -->
+    <div class="w-full p-4 md:p-5 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-300 group flex items-center justify-between h-20 md:h-20">
       <div>
-        <h2 class="font-bold text-lg group-hover:text-green-400 transition-colors">Seminar Hall 2</h2>
+        <h2 class="font-bold text-base md:text-lg group-hover:text-green-400 transition-colors">Seminar Hall 2</h2>
         <p class="text-gray-400 text-xs mt-1">Capacity: 80</p>
       </div>
-      <span class="text-green-400 text-sm font-medium flex items-center gap-1">
-        ● Available Now
+      <a href="login.html?hall=Seminar%20Hall%202" class="text-green-400 text-xs md:text-sm font-medium flex items-center gap-1">
+        View Calendar
         <div class="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
-      </span>
+      </a>
     </div>
 
-    <div class="w-96 h-20 p-5 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-300 group flex items-center justify-between">
+    <!-- Auditorium -->
+    <div class="w-full p-4 md:p-5 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 shadow-2xl hover:shadow-3xl hover:-translate-y-2 transition-all duration-300 group flex items-center justify-between h-20 md:h-20">
       <div>
-        <h2 class="font-bold text-lg group-hover:text-green-400 transition-colors">Main Auditorium</h2>
+        <h2 class="font-bold text-base md:text-lg group-hover:text-green-400 transition-colors">Main Auditorium</h2>
         <p class="text-gray-400 text-xs mt-1">Capacity: 300</p>
       </div>
-      <span class="text-green-400 text-sm font-medium flex items-center gap-1">
-        ● Available Now
+      <a href="login.html?hall=Main%20Auditorium" class="text-green-400 text-xs md:text-sm font-medium flex items-center gap-1">
+        View Calendar
         <div class="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
-      </span>
+      </a>
     </div>
   </div>
 </section>
 
-<!-- AVAILABILITY SECTION -->
-<section id="availability" class="bg-gray-50 text-gray-800 py-24 px-10 pt-32">
+<!-- AVAILABILITY SECTION - ALL LINKS FIXED -->
+<section id="availability" class="bg-gray-50 text-gray-800 py-16 md:py-24 px-4 md:px-10 pt-24 md:pt-32">
   <div class="text-center max-w-4xl mx-auto">
-    <p class="text-green-600 text-sm font-semibold tracking-wider uppercase">REAL-TIME UPDATES</p>
-    <h2 class="text-4xl md:text-5xl font-bold mt-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+    <p class="text-green-600 text-xs md:text-sm font-semibold tracking-wider uppercase">REAL-TIME UPDATES</p>
+    <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mt-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent leading-tight">
       Hall Availability
     </h2>
-    <p class="text-gray-600 mt-6 text-lg max-w-2xl mx-auto leading-relaxed">
+    <p class="text-gray-600 mt-6 text-base md:text-lg max-w-2xl mx-auto leading-relaxed px-4">
       Check the current status of all event spaces and find the perfect venue for your next event.
     </p>
     
     <!-- Filters -->
-    <div class="flex justify-center gap-3 mt-12 flex-wrap">
-      <button class="px-6 py-3 rounded-full bg-gray-900 text-white text-sm font-medium shadow-lg hover:bg-gray-800 transition-all duration-300">All Halls</button>
-      <button class="px-6 py-3 rounded-full bg-white text-gray-700 text-sm font-medium shadow-md hover:shadow-lg hover:bg-gray-50 transition-all duration-300 border">Seminar Hall 1</button>
-      <button class="px-6 py-3 rounded-full bg-white text-gray-700 text-sm font-medium shadow-md hover:shadow-lg hover:bg-gray-50 transition-all duration-300 border">Seminar Hall 2</button>
-      <button class="px-6 py-3 rounded-full bg-white text-gray-700 text-sm font-medium shadow-md hover:shadow-lg hover:bg-gray-50 transition-all duration-300 border">Main Auditorium</button>
+    <div class="flex flex-wrap justify-center gap-2 md:gap-3 mt-8 md:mt-12 px-2">
+      <button class="px-4 py-2 md:px-6 md:py-3 rounded-full bg-gray-900 text-white text-xs md:text-sm font-medium shadow-lg hover:bg-gray-800 transition-all duration-300 flex-1 min-w-[120px] md:flex-none">All Halls</button>
+      <button class="px-4 py-2 md:px-6 md:py-3 rounded-full bg-white text-gray-700 text-xs md:text-sm font-medium shadow-md hover:shadow-lg hover:bg-gray-50 transition-all duration-300 border flex-1 min-w-[120px] md:flex-none">Hall 1</button>
+      <button class="px-4 py-2 md:px-6 md:py-3 rounded-full bg-white text-gray-700 text-xs md:text-sm font-medium shadow-md hover:shadow-lg hover:bg-gray-50 transition-all duration-300 border flex-1 min-w-[120px] md:flex-none">Hall 2</button>
+      <button class="px-4 py-2 md:px-6 md:py-3 rounded-full bg-white text-gray-700 text-xs md:text-sm font-medium shadow-md hover:shadow-lg hover:bg-gray-50 transition-all duration-300 border flex-1 min-w-[120px] md:flex-none md:w-auto">Auditorium</button>
     </div>
   </div> 
 
-  <!-- Cards Grid -->
-  <div class="grid md:grid-cols-3 gap-8 mt-20 max-w-7xl mx-auto">
+  <!-- Cards Grid - ALL BUTTONS FIXED -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-12 md:mt-20 max-w-7xl mx-auto px-4">
     <!-- Seminar Hall 1 -->
-    <div class="group bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-3">
+    <div class="group bg-white rounded-2xl md:rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-3">
       <div class="relative overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?q=80&w=1200" class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700">
-        <span class="absolute top-4 left-4 bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium shadow-lg">
+        <img src="https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?q=80&w=1200" class="w-full h-48 md:h-64 object-cover group-hover:scale-110 transition-transform duration-700">
+        <span class="absolute top-3 left-3 bg-green-500 text-white text-xs px-2.5 py-1 rounded-full font-medium shadow-lg">
           Available Now
-          <div class="w-2 h-2 bg-white rounded-full ml-1 inline-block animate-ping"></div>
+          <div class="w-1.5 h-1.5 bg-white rounded-full ml-1 inline-block animate-ping"></div>
         </span>
       </div>
-      <div class="p-8">
-        <h3 class="font-bold text-2xl text-gray-900 group-hover:text-green-600 transition-colors mb-3">Seminar Hall 1</h3>
-        <div class="flex gap-4 text-sm text-gray-600 mb-4">
+      <div class="p-6 md:p-8">
+        <h3 class="font-bold text-xl md:text-2xl text-gray-900 group-hover:text-green-600 transition-colors mb-3">Seminar Hall 1</h3>
+        <div class="flex flex-wrap gap-3 text-sm text-gray-600 mb-4">
           <span class="flex items-center gap-1">👥 80 seats</span>
           <span class="flex items-center gap-1">📶 WiFi</span>
         </div>
-        <div class="flex flex-wrap gap-3 text-xs text-gray-500 mb-6">
-          <span class="px-3 py-1 bg-gray-100 rounded-full">Projector</span>
-          <span class="px-3 py-1 bg-gray-100 rounded-full">Sound System</span>
-          <span class="px-3 py-1 bg-gray-100 rounded-full">AC</span>
+        <div class="flex flex-wrap gap-2 text-xs text-gray-500 mb-6">
+          <span class="px-2.5 py-1 bg-gray-100 rounded-full">Projector</span>
+          <span class="px-2.5 py-1 bg-gray-100 rounded-full">Sound</span>
+          <span class="px-2.5 py-1 bg-gray-100 rounded-full">AC</span>
         </div>
-        <a href="calendar.html">
-          <button class="w-full bg-gray-900 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl group-hover:scale-[1.02]">
+        <a href="login.html?hall=Seminar%20Hall%201">
+          <button class="w-full bg-gray-900 text-white py-3 md:py-4 rounded-xl md:rounded-2xl font-semibold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl group-hover:scale-[1.02] text-sm md:text-base">
             View Calendar →
           </button>
         </a>
@@ -139,27 +179,27 @@
     </div>
 
     <!-- Seminar Hall 2 -->
-    <div class="group bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-3">
+    <div class="group bg-white rounded-2xl md:removed-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-3">
       <div class="relative overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?q=80&w=1200" class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700">
-        <span class="absolute top-4 left-4 bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium shadow-lg">
+        <img src="https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?q=80&w=1200" class="w-full h-48 md:h-64 object-cover group-hover:scale-110 transition-transform duration-700">
+        <span class="absolute top-3 left-3 bg-green-500 text-white text-xs px-2.5 py-1 rounded-full font-medium shadow-lg">
           Available Now
-          <div class="w-2 h-2 bg-white rounded-full ml-1 inline-block animate-ping"></div>
+          <div class="w-1.5 h-1.5 bg-white rounded-full ml-1 inline-block animate-ping"></div>
         </span>
       </div>
-      <div class="p-8">
-        <h3 class="font-bold text-2xl text-gray-900 group-hover:text-green-600 transition-colors mb-3">Seminar Hall 2</h3>
-        <div class="flex gap-4 text-sm text-gray-600 mb-4">
+      <div class="p-6 md:p-8">
+        <h3 class="font-bold text-xl md:text-2xl text-gray-900 group-hover:text-green-600 transition-colors mb-3">Seminar Hall 2</h3>
+        <div class="flex flex-wrap gap-3 text-sm text-gray-600 mb-4">
           <span class="flex items-center gap-1">👥 80 seats</span>
           <span class="flex items-center gap-1">📶 WiFi</span>
         </div>
-        <div class="flex flex-wrap gap-3 text-xs text-gray-500 mb-6">
-          <span class="px-3 py-1 bg-gray-100 rounded-full">Projector</span>
-          <span class="px-3 py-1 bg-gray-100 rounded-full">Sound System</span>
-          <span class="px-3 py-1 bg-gray-100 rounded-full">AC</span>
+        <div class="flex flex-wrap gap-2 text-xs text-gray-500 mb-6">
+          <span class="px-2.5 py-1 bg-gray-100 rounded-full">Projector</span>
+          <span class="px-2.5 py-1 bg-gray-100 rounded-full">Sound</span>
+          <span class="px-2.5 py-1 bg-gray-100 rounded-full">AC</span>
         </div>
-        <a href="calendar.html">
-          <button class="w-full bg-gray-900 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl group-hover:scale-[1.02]">
+        <a href="login.html?hall=Seminar%20Hall%202">
+          <button class="w-full bg-gray-900 text-white py-3 md:py-4 rounded-xl md:rounded-2xl font-semibold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl group-hover:scale-[1.02] text-sm md:text-base">
             View Calendar →
           </button>
         </a>
@@ -167,28 +207,28 @@
     </div>
 
     <!-- Main Auditorium -->
-    <div class="group bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-3">
+    <div class="group bg-white rounded-2xl md:rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-3">
       <div class="relative overflow-hidden">
-        <img src="https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?q=80&w=1200" class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700">
-      <span class="absolute top-4 left-4 bg-green-500 text-white text-xs px-3 py-1 rounded-full font-medium shadow-lg">
+        <img src="https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?q=80&w=1200" class="w-full h-48 md:h-64 object-cover group-hover:scale-110 transition-transform duration-700">
+        <span class="absolute top-3 left-3 bg-green-500 text-white text-xs px-2.5 py-1 rounded-full font-medium shadow-lg">
           Available Now
-          <div class="w-2 h-2 bg-white rounded-full ml-1 inline-block animate-ping"></div>
+          <div class="w-1.5 h-1.5 bg-white rounded-full ml-1 inline-block animate-ping"></div>
         </span>
       </div>
-      <div class="p-8">
-        <h3 class="font-bold text-2xl text-gray-900 group-hover:text-green-600 transition-colors mb-3">Main Auditorium</h3>
-        <div class="flex gap-4 text-sm text-gray-600 mb-4">
+      <div class="p-6 md:p-8">
+        <h3 class="font-bold text-xl md:text-2xl text-gray-900 group-hover:text-green-600 transition-colors mb-3">Main Auditorium</h3>
+        <div class="flex flex-wrap gap-3 text-sm text-gray-600 mb-4">
           <span class="flex items-center gap-1">👥 300 seats</span>
           <span class="flex items-center gap-1">📶 WiFi</span>
         </div>
-        <div class="flex flex-wrap gap-3 text-xs text-gray-500 mb-6">
-          <span class="px-3 py-1 bg-gray-100 rounded-full">Projector</span>
-          <span class="px-3 py-1 bg-gray-100 rounded-full">Sound System</span>
-          <span class="px-3 py-1 bg-gray-100 rounded-full">AC</span>
-          <span class="px-3 py-1 bg-gray-100 rounded-full">Stage</span>
+        <div class="flex flex-wrap gap-2 text-xs text-gray-500 mb-6">
+          <span class="px-2.5 py-1 bg-gray-100 rounded-full">Projector</span>
+          <span class="px-2.5 py-1 bg-gray-100 rounded-full">Sound</span>
+          <span class="px-2.5 py-1 bg-gray-100 rounded-full">AC</span>
+          <span class="px-2.5 py-1 bg-gray-100 rounded-full">Stage</span>
         </div>
-        <a href="calendar.html">
-          <button class="w-full bg-gray-900 text-white py-4 rounded-2xl font-semibold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl group-hover:scale-[1.02]">
+        <a href="login.html?hall=Main%20Auditorium">
+          <button class="w-full bg-gray-900 text-white py-3 md:py-4 rounded-xl md:rounded-2xl font-semibold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl group-hover:scale-[1.02] text-sm md:text-base">
             View Calendar →
           </button>
         </a>
@@ -197,14 +237,14 @@
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer class="bg-gradient-to-r from-green-700 via-teal-600 to-green-500 text-white px-10 py-16">
-  <div class="grid md:grid-cols-4 gap-12 max-w-7xl mx-auto">
+<!-- Footer - FIXED -->
+<footer class="bg-gradient-to-r from-green-700 via-teal-600 to-green-500 text-white px-4 md:px-10 py-12 md:py-16">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 max-w-7xl mx-auto">
     <!-- Brand -->
-    <div>
+    <div class="col-span-1 md:col-span-2 lg:col-span-1">
       <div class="flex items-center gap-3 mb-6">
         <div class="w-12 h-12 bg-white/90 rounded-2xl shadow-lg"></div>
-        <h2 class="text-2xl font-bold">CampusHalls</h2>
+        <h2 class="text-xl md:text-2xl font-bold">CampusHalls</h2>
       </div>
       <p class="text-white/90 text-sm leading-relaxed mb-6 max-w-sm">
         Your one-stop solution for booking seminar halls and auditorium spaces on campus with real-time availability.
@@ -222,7 +262,7 @@
       <ul class="space-y-3 text-sm text-white/80">
         <li><a href="#home" class="hover:text-white transition-colors block py-1">Home</a></li>
         <li><a href="#availability" class="hover:text-white transition-colors block py-1">Availability</a></li>
-        <li><a href="calendar.html" class="hover:text-white transition-colors block py-1">View Calendars</a></li>
+        <li><a href="login.html?hall=Seminar%20Hall%201" class="hover:text-white transition-colors block py-1">View Calendars</a></li>
         <li><a href="#" class="hover:text-white transition-colors block py-1">Booking Guide</a></li>
       </ul>
     </div>
@@ -231,8 +271,8 @@
     <div>
       <h3 class="font-bold text-lg mb-6">Our Halls</h3>
       <ul class="space-y-3 text-sm text-white/80">
-        <li class="flex items-center gap-2 py-1">📍 Seminar Hall 1 (80 seats)</li>
-        <li class="flex items-center gap-2 py-1">📍 Seminar Hall 2 (80 seats)</li>
+        <li class="flex items-center gap-2 py-1">📚 Seminar Hall 1 (80 seats)</li>
+        <li class="flex items-center gap-2 py-1">📖 Seminar Hall 2 (80 seats)</li>
         <li class="flex items-center gap-2 py-1 font-semibold">🎭 Main Auditorium (300 seats)</li>
       </ul>
     </div>
@@ -243,38 +283,50 @@
       <ul class="space-y-3 text-sm text-white/80">
         <li class="flex items-center gap-2">📧 booking@college.edu</li>
         <li class="flex items-center gap-2">📞 +91 98765 43210</li>
-        <li class="flex items-center gap-2">📍 123 University Avenue, Campus Zone</li>
+        <li class="flex items-center gap-2">📍 123 University Avenue</li>
       </ul>
     </div>
   </div>
 
   <!-- Bottom -->
-  <div class="flex flex-col md:flex-row justify-between items-center mt-16 border-t border-white/30 pt-8 text-sm text-white/70 max-w-7xl mx-auto">
+  <div class="flex flex-col md:flex-row justify-between items-center mt-12 md:mt-16 border-t border-white/30 pt-6 md:pt-8 text-xs md:text-sm text-white/70 max-w-7xl mx-auto px-4">
     <p>&copy; 2024 CampusHalls. All rights reserved.</p>
-    <div class="flex gap-8 mt-4 md:mt-0">
-      <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-      <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
-      <a href="calendar.html" class="hover:text-white transition-colors">Video Tutorial</a>
+    <div class="flex flex-wrap gap-4 md:gap-8 mt-4 md:mt-0">
+      <a href="#" class="hover:text-white transition-colors">Privacy</a>
+      <a href="#" class="hover:text-white transition-colors">Terms</a>
+      <a href="login.html?hall=Seminar%20Hall%201" class="hover:text-white transition-colors">Tutorial</a>
     </div>
   </div>
 </footer>
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyA1VE0YP88fk7tJ-NynBt_A0dNnoMyVi44",
-  authDomain: "hall-booking-de99d.firebaseapp.com",
-  projectId: "hall-booking-de99d",
-  storageBucket: "hall-booking-de99d.firebasestorage.app",
-  messagingSenderId: "1077560501819",
-  appId: "1:1077560501819:web:a57337c0cb22859d869e1e"
-};
+<script>
+  // Mobile menu toggle
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  
+  mobileMenuBtn.addEventListener('click', () => {
+    mobileMenu.classList.toggle('opacity-100');
+    mobileMenu.classList.toggle('invisible');
+  });
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+  // Close mobile menu on link click
+  document.querySelectorAll('#mobileMenu a').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenu.classList.add('opacity-0', 'invisible');
+    });
+  });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
 
 </body>
 </html>
