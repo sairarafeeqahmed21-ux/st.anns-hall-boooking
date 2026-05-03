@@ -12,7 +12,6 @@
       outline: none;
       box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
     }
-    /* Equipment selection - FULL CELL GREEN (NO TICK) */
     .equipment-item {
       position: relative;
       transition: all 0.3s ease;
@@ -70,18 +69,18 @@
       <div class="inline-flex items-center gap-2 px-4 py-2 bg-teal-100 text-teal-700 rounded-full text-sm font-medium mb-4">
         COMPLETE YOUR BOOKING
       </div>
-      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Registration Form</h2>
-      <p class="text-gray-600 text-lg max-w-md mx-auto">Fill in your details to confirm your Seminar Hall 2 booking</p>
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3" id="regTitle">Registration Form</h2>
+      <p class="text-gray-600 text-lg max-w-md mx-auto" id="regSubtitle">Fill in your details to confirm your booking</p>
     </div>
 
     <!-- Hall Card -->
-    <div class="bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 text-white p-8 rounded-2xl shadow-2xl mb-8">
+    <div class="bg-gradient-to-r from-gray-800 via-gray-700 to-gray-900 text-white p-8 rounded-2xl shadow-2xl mb-8" id="hallCard">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h3 class="text-2xl font-bold mb-1">Seminar Hall 2</h3>
-          <p class="text-gray-300 text-lg">Capacity: <span class="font-semibold">80 seats</span></p>
+          <h3 class="text-2xl font-bold mb-1" id="hallName">Seminar Hall 2</h3>
+          <p class="text-gray-300 text-lg">Capacity: <span class="font-semibold" id="hallCapacity">80 seats</span></p>
         </div>
-        <div class="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-xl text-sm font-medium">
+        <div class="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-xl text-sm font-medium" id="bookingDetails">
           Thursday, April 30 • 2:00 PM - 5:00 PM
         </div>
       </div>
@@ -100,15 +99,15 @@
         <div class="grid md:grid-cols-2 gap-6">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-            <input type="text" id="name" name="fullName" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="John Doe" />
+            <input type="text" name="fullName" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="John Doe" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-            <input type="email" id="email" name="email" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="john@example.com" />
+            <input type="email" name="email" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="john@example.com" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
-            <input type="tel" id="phone" name="phone" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="+1 (555) 123-4567" />
+            <input type="tel" name="phone" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="+1 (555) 123-4567" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Department / Organization</label>
@@ -133,7 +132,7 @@
           
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Expected Attendees *</label>
-            <input type="number" name="attendees" min="1" max="80" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="50" />
+            <input type="number" name="attendees" min="1" max="300" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-teal-500 transition-all duration-200" placeholder="50" />
           </div>
 
           <div>
@@ -147,7 +146,7 @@
         </div>
       </section>
 
-      <!-- Equipment - FULL CELL GREEN (NO TICK) -->
+      <!-- Equipment -->
       <section class="mt-16">
         <h3 class="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-2">
           <span class="w-2 h-8 bg-teal-500 rounded-full"></span>
@@ -160,27 +159,22 @@
             <input type="checkbox" name="equipment" value="projector" id="projector" />
             <label for="projector" class="equipment-label">Projector</label>
           </div>
-          
           <div class="equipment-item">
             <input type="checkbox" name="equipment" value="sound" id="sound" />
             <label for="sound" class="equipment-label">Sound System</label>
           </div>
-          
           <div class="equipment-item">
             <input type="checkbox" name="equipment" value="microphones" id="microphones" />
             <label for="microphones" class="equipment-label">Microphones</label>
           </div>
-          
           <div class="equipment-item">
             <input type="checkbox" name="equipment" value="podium" id="podium" />
             <label for="podium" class="equipment-label">Podium</label>
           </div>
-          
           <div class="equipment-item">
             <input type="checkbox" name="equipment" value="whiteboard" id="whiteboard" />
             <label for="whiteboard" class="equipment-label">Whiteboard</label>
           </div>
-          
           <div class="equipment-item">
             <input type="checkbox" name="equipment" value="wifi" id="wifi" />
             <label for="wifi" class="equipment-label">WiFi Access</label>
@@ -205,21 +199,20 @@
         </label>
       </div>
 
-      <!-- Buttons - PERFECTLY HORIZONTAL -->
+      <!-- Buttons -->
       <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4 pt-8 border-t border-gray-100">
-        <button type="button" class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center gap-2 border border-gray-200 hover:border-gray-300 h-16">
+        <button type="button" onclick="window.history.back()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center gap-2 border border-gray-200 hover:border-gray-300 h-16">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
           Cancel
         </button>
-       <!-- Change button type from "button" to "submit" -->
-<button type="submit" id="bookBtn" class="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 h-16">
-  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-  </svg>
-  Confirm Booking
-</button>
+        <button type="submit" id="bookBtn" class="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 h-16">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          Confirm Booking
+        </button>
       </div>
     </form>
   </div>
@@ -234,18 +227,90 @@
         <h3 class="font-bold text-2xl">CampusHalls</h3>
       </div>
       <p class="text-sm opacity-90">© 2026 CampusHalls. All rights reserved.</p>
-      <div class="mt-4 text-sm space-x-6">
-        <a href="calendar.html" class="hover:text-white/90 transition-colors font-medium">Calendar</a>
-        <a href="hallbooking.html" class="hover:text-white/90 transition-colors font-medium">Halls</a>
-      </div>
     </div>
   </footer>
 
-  <script>
-    // Form validation and submission
-    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+  <!-- 🔥 FIXED FIREBASE SCRIPT - ONE CLEAN VERSION -->
+  <script type="module">
+    // Firebase imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyA1VE0YP88fk7tJ-NynBt_A0dNnoMyVi44",
+      authDomain: "hall-booking-de99d.firebaseapp.com",
+      projectId: "hall-booking-de99d",
+      storageBucket: "hall-booking-de99d.firebasestorage.app",
+      messagingSenderId: "1077560501819",
+      appId: "1:1077560501819:web:a57337c0cb22859d869e1e"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const hallName = decodeURIComponent(urlParams.get('hall') || 'Seminar Hall 2');
+    let selectedDate = urlParams.get('date') || '2024/04/30';
+    
+    // Fix date format for calendar (YYYY-MM-DD)
+    const dateObj = new Date(selectedDate.replace(/\//g, '-'));
+    const formattedDate = dateObj.toISOString().split('T')[0]; // YYYY-MM-DD
+
+    // Update UI with hall info
+    document.getElementById('hallName').textContent = hallName;
+    document.getElementById('hallCapacity').textContent = hallName.includes('Auditorium') ? '300 seats' : '80 seats';
+    document.getElementById('bookingDetails').textContent = selectedDate + ' • 2:00 PM - 5:00 PM';
+    document.getElementById('regTitle').textContent = hallName + ' - Registration';
+    document.getElementById('regSubtitle').textContent = `Fill in your details to confirm your ${hallName} booking`;
+
+    // Form submission
+    document.getElementById('bookingForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      alert('✅ Booking confirmed successfully!\n\nCheck your email for confirmation.');
+      
+      // Show loading
+      const bookBtn = document.getElementById('bookBtn');
+      const originalText = bookBtn.innerHTML;
+      bookBtn.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Booking...';
+      bookBtn.disabled = true;
+
+      try {
+        // Collect form data
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+        
+        // Convert equipment to array
+        data.equipment = Array.from(formData.getAll('equipment'));
+        
+        // Add booking details
+        data.hall = hallName;
+        data.date = formattedDate; // YYYY-MM-DD format for calendar
+        data.displayDate = selectedDate; // Original format for display
+        data.timestamp = serverTimestamp();
+        data.status = 'confirmed';
+
+        console.log('📤 Submitting booking:', data);
+
+        // Save to Firebase
+        await addDoc(collection(db, "bookings"), data);
+        
+        // Success!
+        alert(`✅ ${data.eventName} confirmed!\n\n📅 ${selectedDate}\n🏛️ ${hallName}\n👤 ${data.fullName}\n\n🔄 Returning to calendar...`);
+        
+        // Redirect to calendar with hall parameter
+        const calendarUrl = `calendar.html?hall=${encodeURIComponent(hallName)}#${formattedDate}`;
+        window.location.href = calendarUrl;
+        
+      } catch (error) {
+        console.error('❌ Firebase Error:', error);
+        alert('❌ Booking failed. Please try again.\n\n' + error.message);
+      } finally {
+        // Reset button
+        bookBtn.innerHTML = originalText;
+        bookBtn.disabled = false;
+      }
     });
 
     // Time validation
@@ -262,105 +327,8 @@
       }
     }
     
-    startTime.addEventListener('change', validateTimes);
-    endTime.addEventListener('change', validateTimes);
-      </script>
-      <script>
-  // Read data from calendar
-  const urlParams = new URLSearchParams(window.location.search);
-  const hallName = decodeURIComponent(urlParams.get('hall') || 'Seminar Hall 2');
-  const selectedDate = urlParams.get('date') || 'Thursday, April 30';
-  
-  // Update hall card
-  document.querySelector('.bg-gradient-to-r').querySelector('h3').textContent = hallName;
-  document.querySelector('.bg-white\\/10').textContent = selectedDate + ' • 2:00 PM - 5:00 PM';
-</script>
-<script>
-// Read data from calendar URL params
-const urlParams = new URLSearchParams(window.location.search);
-const hallName = decodeURIComponent(urlParams.get('hall') || 'Seminar Hall 2');
-const selectedDate = urlParams.get('date') || 'Thursday, April 30';
-
-// Update hall card
-document.querySelector('.bg-gradient-to-r h3').textContent = hallName;
-
-// Time validation
-const startTime = document.querySelector('[name="startTime"]');
-const endTime = document.querySelector('[name="endTime"]');
-
-function validateTimes() {
-  if (startTime.value && endTime.value && endTime.value <= startTime.value) {
-    endTime.setCustomValidity('End time must be after start time');
-    endTime.style.borderColor = '#ef4444';
-  } else {
-    endTime.setCustomValidity('');
-    endTime.style.borderColor = '';
-  }
-}
-
-startTime.addEventListener('change', validateTimes);
-endTime.addEventListener('change', validateTimes);
-</script>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyA1VE0YP88fk7tJ-NynBt_A0dNnoMyVi44",
-  authDomain: "hall-booking-de99d.firebaseapp.com",
-  projectId: "hall-booking-de99d",
-  storageBucket: "hall-booking-de99d.firebasestorage.app",
-  messagingSenderId: "1077560501819",
-  appId: "1:1077560501819:web:a57337c0cb22859d869e1e"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// ✅ FIXED SUBMIT FUNCTION - collects ALL form data
-async function submitBooking() {
-  // Get all form data
-  const formData = new FormData(document.getElementById('bookingForm'));
-  const data = Object.fromEntries(formData);
-  
-  // Convert equipment checkboxes to array
-  data.equipment = Array.from(formData.getAll('equipment'));
-  
-  // Add URL params and timestamp
-  data.hall = hallName;
-  data.date = selectedDate;
-  data.createdAt = new Date().toISOString();
-
-  try {
-    console.log('Submitting:', data); // Debug log
-    
-    await addDoc(collection(db, "bookings"), data);
-    
-    alert(`✅ Booking confirmed successfully!\n\nHall: ${hallName}\nDate: ${selectedDate}\nCheck your email for confirmation.`);
-    
-    // Reset form
-    document.getElementById('bookingForm').reset();
-    
-  } catch (error) {
-    console.error('Firebase Error:', error);
-    alert('❌ Booking failed. Please try again.');
-  }
-}
-
-// ✅ Connect to the BOOK button (change type="submit" in HTML too)
-document.getElementById('bookBtn').addEventListener('click', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  submitBooking();
-});
-
-// ✅ Also handle form submit
-document.getElementById('bookingForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  submitBooking();
-});
-</script>
-  
+    startTime?.addEventListener('change', validateTimes);
+    endTime?.addEventListener('change', validateTimes);
+  </script>
 </body>
 </html>
