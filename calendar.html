@@ -365,44 +365,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
   calendar.render();
 
- // 🔥 MAP WEBSITE → FIREBASE NAMES (OLD NAMES)
-const firebaseHallNames = {
-  "Deickmann Hall": "Deickmann Hall",
-  "Gnanamma Hall": "Gnanamma Hall",
-  "St.Joseph's Auditorium": "St.Joseph's auditorium"  // 🔥 Exact Firebase name
-};
+  // 🔥 LOAD EVENTS AFTER CALENDAR RENDERS
+  const q = query(collection(db, "bookings"), where("hall", "==", hallName));
+  
+  onSnapshot(q, (snapshot) => {
+    calendar.removeAllEvents();
 
-const firebaseHallName = firebaseHallNames[hallName];
-console.log("🌐 Website:", hallName, "→ 🔥 Firebase:", firebaseHallName);
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (!data.date || !data.eventName) return;
 
-// 🔥 LOAD EVENTS - USE FIREBASE NAME
-const q = query(collection(db, "bookings"), where("hall", "==", firebaseHallName));
+      let eventDate = new Date(data.date.replace(/\//g, '-'));
+      if (isNaN(eventDate)) return;
 
-onSnapshot(q, (snapshot) => {
-  console.log("📊 Events loaded:", snapshot.size);
-  calendar.removeAllEvents();
-
-  snapshot.forEach((doc) => {
-    const data = doc.data();
-    if (!data.date || !data.eventName) return;
-
-    let eventDate = new Date(data.date.replace(/\//g, '-'));
-    if (isNaN(eventDate)) return;
-
-    calendar.addEvent({
-      id: doc.id,
-      title: data.eventName,
-      start: eventDate,
-      display: 'auto',
-      extendedProps: {
-        time: data.startTime || "All Day",
-        startTime: data.startTime || "All Day",
-        endTime: data.endTime || ""
-      }
+     calendar.addEvent({
+  id: doc.id,
+  title: data.eventName, // ✅ ONLY NAME
+  start: eventDate,
+  display: 'auto',
+  extendedProps: {
+    time: data.startTime || "All Day",     // 🔥 ADD THIS LINE
+    startTime: data.startTime || "All Day",
+    endTime: data.endTime || ""
+  }
+});
+  
     });
   });
-}, (error) => {
-  console.error("🔥 Firestore Error:", error);
 });
 </script>
 </body>
