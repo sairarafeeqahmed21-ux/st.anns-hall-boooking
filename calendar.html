@@ -9,7 +9,6 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Your existing styles remain exactly the same */
 body { font-family: 'Inter', sans-serif; }
 .fc {
   --fc-border-color: #e2e8f0;
@@ -133,17 +132,30 @@ body { font-family: 'Inter', sans-serif; }
   50% { box-shadow: 0 2px 12px rgba(239, 68, 68, 0.7); }
   100% { box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4); }
 }
-.fc-event { display: none !important; }
+.fc-event { 
+  display: none !important; 
+  cursor: pointer !important;
+}
 .fc-scrollgrid { border: none !important; }
 .fc-daygrid-event {
   display: block !important;
   font-size: 11px !important;
-  padding: 2px 4px !important;
+  padding: 2px 6px !important;
   margin: 1px !important;
-  background: #ef4444 !important;
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
   color: white !important;
   border: none !important;
-  border-radius: 4px !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: calc(100% - 4px) !important;
+}
+.fc-daygrid-event:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5) !important;
 }
 </style>
 </head>
@@ -168,7 +180,7 @@ body { font-family: 'Inter', sans-serif; }
       ← Back to Halls
     </a>
     <h2 class="text-2xl font-semibold" id="hallTitle">Seminar Hall 1</h2>
-    <p class="text-gray-500 text-sm mt-1" id="hallInfo">Capacity: 80 seats • Click a date to book (today onwards)</p>
+    <p class="text-gray-500 text-sm mt-1" id="hallInfo">Capacity: 80 seats • Click FREE dates to book | Click BOOKED events to view details</p>
     <div class="flex gap-3 mt-4">
       <span class="px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs flex items-center gap-1">+ Available</span>
       <span class="px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs flex items-center gap-1">🔴 Booked</span>
@@ -241,55 +253,55 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.getElementById('hallTitle').textContent = `${config.emoji} ${hallName}`;
   document.getElementById('hallInfo').textContent =
-    `Capacity: ${config.capacity} • Click a date to book (today onwards)`;
+    `Capacity: ${config.capacity} • Click FREE dates to book | Click BOOKED events to view details`;
 
   let calendarEvents = [];
   let calendar;
 
-  // ✅ FIREBASE QUERY (ONLY BY HALL — no status bug)
+  // ✅ FIREBASE QUERY - FIXED (only eventName, no time)
   const q = query(
     collection(db, "bookings"),
     where("hall", "==", hallName)
   );
+onSnapshot(q, (snapshot) => {
+  calendarEvents = [];
 
-  onSnapshot(q, (snapshot) => {
-    calendarEvents = [];
+  snapshot.forEach((doc) => {
+    const data = doc.data();
 
-    snapshot.forEach((doc) => {
-      const data = doc.data();
+    if (!data.date || !data.eventName) return;
 
-      if (!data.date) return;
+    let eventDate;
 
-      let eventDate;
+    if (typeof data.date === "string") {
+      eventDate = new Date(data.date.replace(/\//g, '-'));
+    } else if (data.date?.toDate) {
+      eventDate = data.date.toDate();
+    }
 
-      if (typeof data.date === "string") {
-        eventDate = new Date(data.date.replace(/\//g, '-'));
-      } else if (data.date?.toDate) {
-        eventDate = data.date.toDate();
-      }
-
-      if (!isNaN(eventDate)) {
-        calendarEvents.push({
-          id: doc.id,
-          title: data.eventName || "Booked",
-          start: eventDate,
-          extendedProps: {
-            time: data.startTime ? `${data.startTime} - ${data.endTime}` : "All Day",
-            organizer: data.fullName || "Unknown"
-          }
-        });
-      }
-    });
-
-    console.log(`📊 ${calendarEvents.length} events loaded for ${hallName}`);
-
-    if (calendar) {
-      calendar.removeAllEvents();
-      calendar.addEventSource(calendarEvents);
+    if (!isNaN(eventDate)) {
+      calendarEvents.push({
+        id: doc.id,
+        title: data.eventName, // ✅ Only event name on calendar
+        start: eventDate,
+        extendedProps: {
+          startTime: data.startTime || "All Day", // ✅ Time for popup
+          endTime: data.endTime || "",
+          organizer: data.fullName || "Unknown"
+        }
+      });
     }
   });
 
-  // ✅ INIT CALENDAR
+  console.log(`📊 ${calendarEvents.length} events loaded for ${hallName}`);
+
+  if (calendar) {
+    calendar.removeAllEvents();
+    calendar.addEventSource(calendarEvents);
+  }
+});
+
+  // ✅ INIT CALENDAR - FIXED EVENT HANDLING
   const calendarEl = document.getElementById('calendar');
 
   calendar = new FullCalendar.Calendar(calendarEl, {
@@ -304,11 +316,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     events: calendarEvents,
 
-    eventDidMount: function(info) {
-      info.el.title =
-        `${info.event.title}\n${info.event.extendedProps.time}\n${info.event.extendedProps.organizer}`;
-    },
+   
+    // Replace ONLY the eventClick function in the script:
 
+eventClick: function(info) {
+  const eventName = info.event.title;
+  const startTime = info.event.extendedProps.startTime || "Time not specified";
+  const endTime = info.event.extendedProps.endTime || "";
+  const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
+  
+  alert(`🔴 BOOKED\n\n📋 Event: ${eventName}\n🕐 Time: ${timeRange}`);
+},
+    // ✅ CLICK FREE DATE TO BOOK
     dateClick: function(info) {
       const today = new Date();
       today.setHours(0,0,0,0);
@@ -321,12 +340,13 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
+      // ✅ Check if date has events
       const eventsOnDate = calendar.getEvents().filter(e =>
         e.start.toDateString() === clickedDate.toDateString()
       );
 
       if (eventsOnDate.length > 0) {
-        alert("🔴 This date is already booked");
+        alert("🔴 This date is already booked!\n\nClick the red event dot to see details.");
         return;
       }
 
@@ -334,6 +354,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
       window.location.href =
         `registration.html?hall=${encodeURIComponent(hallName)}&date=${formattedDate}`;
+    },
+
+    eventDidMount: function(info) {
+      // Add click cursor to events
+      info.el.style.cursor = 'pointer';
+      info.el.title = `${info.event.title}`;
     }
   });
 
