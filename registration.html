@@ -55,6 +55,12 @@
       background: #f0fdfa;
       transform: translateY(-1px);
     }
+    /* 🔥 WHITE LOGO BACKGROUND IN FOOTER */
+    .footer-logo {
+      background: white;
+      padding: 4px;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -87,6 +93,7 @@
         <div>
           <h3 class="text-2xl font-bold mb-1" id="hallName">Deickmann Hall</h3>
           <p class="text-gray-300 text-lg">Capacity: <span class="font-semibold" id="hallCapacity">200 seats</span></p>
+          <p class="text-gray-400 text-sm mt-1">Available: 9:00 AM - 3:00 PM</p>
         </div>
         <div class="bg-white/10 backdrop-blur-sm px-6 py-3 rounded-xl text-sm font-medium" id="bookingDetails">
           Thursday, April 30 • 2:00 PM - 5:00 PM
@@ -130,7 +137,7 @@
           <span class="w-2 h-8 bg-green-500 rounded-full"></span>
           Event Details
         </h3>
-        <p class="text-gray-600 mb-8">Tell us about your event</p>
+        <p class="text-gray-600 mb-8">Available booking times: <strong>9:00 AM - 3:00 PM</strong></p>
 
         <div class="grid md:grid-cols-2 gap-6">
           <div class="md:col-span-2">
@@ -144,12 +151,12 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Start Time *</label>
-            <input type="time" name="startTime" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-green-500 transition-all duration-200" />
+            <label class="block text-sm font-medium text-gray-700 mb-2">Start Time * (9:00 AM - 3:00 PM)</label>
+            <input type="time" name="startTime" required min="09:00" max="15:00" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-green-500 transition-all duration-200" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">End Time *</label>
-            <input type="time" name="endTime" required class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-green-500 transition-all duration-200" />
+            <label class="block text-sm font-medium text-gray-700 mb-2">End Time * (Max 3:00 PM)</label>
+            <input type="time" name="endTime" required min="09:30" max="15:00" class="form-input w-full border border-gray-200 rounded-xl px-4 py-3 text-lg focus:ring-2 focus:border-green-500 transition-all duration-200" />
           </div>
         </div>
       </section>
@@ -225,21 +232,23 @@
     </form>
   </div>
 
-  <!-- 🔥 ST.ANNS FOOTER - MATCHING CALENDAR -->
+  <!-- 🔥 ST.ANNS FOOTER WITH WHITE LOGO BACKGROUND -->
   <footer class="bg-gradient-to-r from-green-500 to-teal-500 text-white text-center py-8 mt-20">
     <div class="max-w-4xl mx-auto px-4">
       <div class="flex justify-center items-center gap-3 mb-4">
-        <img src="https://ik.imagekit.io/syustaging/SYU_PREPROD/LOGO_Zd7PFpkXn.webp?tr=w-3840" 
-             alt="St.Anns Logo" 
-             class="w-12 h-12 rounded-2xl shadow-lg object-cover"
-             loading="lazy">
+        <div class="footer-logo">
+          <img src="https://ik.imagekit.io/syustaging/SYU_PREPROD/LOGO_Zd7PFpkXn.webp?tr=w-3840" 
+               alt="St.Anns Logo" 
+               class="w-12 h-12 rounded-2xl shadow-lg object-cover"
+               loading="lazy">
+        </div>
         <h3 class="font-bold text-2xl">St.Anns Halls</h3>
       </div>
       <p class="text-sm opacity-90">© 2026 St.Anns Halls. All rights reserved.</p>
     </div>
   </footer>
 
-  <!-- 🔥 FIXED FIREBASE SCRIPT - ST.ANNS HALL CONFIG -->
+  <!-- 🔥 FINAL FIREBASE SCRIPT WITH TIME LIMITS -->
   <script type="module">
     // Firebase imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -287,13 +296,55 @@
     const config = hallConfig[hallName];
     document.getElementById('hallName').textContent = `${config.emoji} ${hallName}`;
     document.getElementById('hallCapacity').textContent = config.capacity;
-    document.getElementById('bookingDetails').textContent = selectedDate + ' • 2:00 PM - 5:00 PM';
+    document.getElementById('bookingDetails').textContent = selectedDate + ' • 9:00 AM - 3:00 PM';
     document.getElementById('regTitle').textContent = `${hallName} - Registration`;
-    document.getElementById('regSubtitle').textContent = `Fill in your details to confirm your ${hallName} booking`;
+    document.getElementById('regSubtitle').textContent = `Fill in your details to confirm your ${hallName} booking (9:00 AM - 3:00 PM)`;
+
+    // 🔥 TIME VALIDATION (9:00 AM - 3:00 PM = 09:00 - 15:00)
+    const startTimeInput = document.querySelector('[name="startTime"]');
+    const endTimeInput = document.querySelector('[name="endTime"]');
+    
+    function validateTimeInput(input, minTime, maxTime) {
+      const time = input.value;
+      if (time < minTime || time > maxTime) {
+        input.setCustomValidity(`Must be between 9:00 AM - 3:00 PM`);
+        input.style.borderColor = '#ef4444';
+      } else {
+        input.setCustomValidity('');
+        input.style.borderColor = '';
+      }
+    }
+
+    function validateTimes() {
+      const startTime = startTimeInput.value;
+      const endTime = endTimeInput.value;
+      
+      // 9:00 AM - 3:00 PM limits
+      validateTimeInput(startTimeInput, '09:00', '15:00');
+      validateTimeInput(endTimeInput, '09:30', '15:00');
+      
+      // End time after start time
+      if (startTime && endTime && endTime <= startTime) {
+        endTimeInput.setCustomValidity('End time must be after start time');
+        endTimeInput.style.borderColor = '#ef4444';
+      }
+    }
+    
+    startTimeInput.addEventListener('change', validateTimes);
+    endTimeInput.addEventListener('change', validateTimes);
+    startTimeInput.addEventListener('blur', validateTimes);
+    endTimeInput.addEventListener('blur', validateTimes);
 
     // Form submission
     document.getElementById('bookingForm').addEventListener('submit', async function(e) {
       e.preventDefault();
+      
+      // 🔥 FINAL TIME VALIDATION BEFORE SUBMIT
+      validateTimes();
+      if (startTimeInput.validity.valid === false || endTimeInput.validity.valid === false) {
+        alert('❌ Please fix time selection (9:00 AM - 3:00 PM only)');
+        return;
+      }
       
       // Show loading
       const bookBtn = document.getElementById('bookBtn');
@@ -322,7 +373,7 @@
         await addDoc(collection(db, "bookings"), data);
         
         // Success!
-        alert(`✅ ${data.eventName} confirmed!\n\n📅 ${selectedDate}\n🏛️ ${hallName}\n👤 ${data.fullName}\n\n🔄 Returning to calendar...`);
+        alert(`✅ ${data.eventName} confirmed!\n\n📅 ${selectedDate}\n🕐 ${data.startTime} - ${data.endTime}\n🏛️ ${hallName}\n👤 ${data.fullName}\n\n🔄 Returning to calendar...`);
         
         // 🔥 REDIRECT TO ST.ANNS CALENDAR WITH HALL PARAMETER
         const calendarUrl = `calendar.html?hall=${encodeURIComponent(hallName)}#${formattedDate}`;
@@ -337,23 +388,6 @@
         bookBtn.disabled = false;
       }
     });
-
-    // Time validation
-    const startTime = document.querySelector('[name="startTime"]');
-    const endTime = document.querySelector('[name="endTime"]');
-    
-    function validateTimes() {
-      if (startTime.value && endTime.value && endTime.value <= startTime.value) {
-        endTime.setCustomValidity('End time must be after start time');
-        endTime.style.borderColor = '#ef4444';
-      } else {
-        endTime.setCustomValidity('');
-        endTime.style.borderColor = '';
-      }
-    }
-    
-    startTime?.addEventListener('change', validateTimes);
-    endTime?.addEventListener('change', validateTimes);
   </script>
 </body>
 </html>
