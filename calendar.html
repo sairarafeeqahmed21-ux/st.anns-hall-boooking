@@ -117,25 +117,35 @@ body { font-family: 'Inter', sans-serif; }
   box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
 }
 
-/* 🔥 RED DOT FOR BOOKED DAYS - MULTIPLE EVENTS */
-.has-events::after {
+/* 🔥 FIXED RED DOT POSITION - NEVER COVERS DATE */
+.has-events .fc-daygrid-day-top::after {
   content: '';
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 14px;
-  height: 14px;
+  top: 6px;
+  right: 6px;
+  width: 12px;
+  height: 12px;
   background: linear-gradient(135deg, #ef4444, #dc2626);
-  border: 3px solid #ffffff;
+  border: 2px solid #ffffff;
   border-radius: 50%;
-  box-shadow: 0 3px 10px rgba(239, 68, 68, 0.5);
-  z-index: 10;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
+  z-index: 15;
   animation: pulse 2s infinite;
 }
+
+/* 🔥 MULTIPLE EVENTS INDICATOR */
+.has-multiple-events .fc-daygrid-day-top::after {
+  width: 16px !important;
+  height: 16px !important;
+  top: 4px !important;
+  right: 4px !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6) !important;
+}
+
 @keyframes pulse {
-  0% { box-shadow: 0 3px 10px rgba(239, 68, 68, 0.5); }
-  50% { box-shadow: 0 3px 16px rgba(239, 68, 68, 0.8); }
-  100% { box-shadow: 0 3px 10px rgba(239, 68, 68, 0.5); }
+  0% { box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5); }
+  50% { box-shadow: 0 2px 12px rgba(239, 68, 68, 0.8); }
+  100% { box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5); }
 }
 
 /* 🔥 HIDE ALL EVENTS - ONLY SHOW RED DOT */
@@ -218,6 +228,16 @@ body { font-family: 'Inter', sans-serif; }
 .event-item:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+}
+.event-item.free {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-color: #bbf7d0;
+}
+.event-item.free .event-time {
+  color: #166534;
+}
+.event-item.free .event-status span {
+  background-color: #10b981;
 }
 .event-time {
   font-size: 18px;
@@ -399,8 +419,8 @@ document.addEventListener('DOMContentLoaded', function () {
       );
 
       if (eventsOnDate.length > 0) {
-        // 🔥 SHOW MODAL WITH ALL EVENTS
-        showEventsModal(info.dateStr, eventsOnDate);
+        // 🔥 SHOW MODAL WITH ALL EVENTS + AVAILABLE SLOTS
+        showEventsModal(info.dateStr, eventsOnDate, timeSlots);
         return;
       }
 
@@ -411,7 +431,6 @@ document.addEventListener('DOMContentLoaded', function () {
     eventDidMount: function(info) {
       // 🔥 HIDE ALL EVENT VISUALS - ONLY RED DOT
       info.el.style.display = 'none';
-      info.el.parentElement.classList.add('has-events');
     }
   });
 
@@ -454,21 +473,24 @@ document.addEventListener('DOMContentLoaded', function () {
         new Date(e.start).toDateString() === new Date(dateStr).toDateString()
       );
       
+      dayEl.classList.remove('has-events', 'has-multiple-events');
+      
       if (events.length > 0) {
         dayEl.classList.add('has-events');
-      } else {
-        dayEl.classList.remove('has-events');
+        if (events.length > 1) {
+          dayEl.classList.add('has-multiple-events');
+        }
       }
     });
   }
 
-  // 🔥 EVENTS MODAL
+  // 🔥 EVENTS MODAL WITH MULTIPLE SLOTS
   const modal = document.getElementById('eventsModal');
   const closeBtn = document.getElementById('closeModal');
   const modalTitle = document.getElementById('modalDateTitle');
   const modalBody = document.getElementById('modalBody');
 
-  function showEventsModal(dateStr, events) {
+  function showEventsModal(dateStr, bookedEvents, availableSlots) {
     const date = new Date(dateStr);
     modalTitle.textContent = date.toLocaleDateString('en-US', {
       weekday: 'long',
@@ -477,18 +499,17 @@ document.addEventListener('DOMContentLoaded', function () {
       day: 'numeric'
     });
 
-    if (events.length === 0) {
-      modalBody.innerHTML = `
-        <div class="no-events">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">No events</h3>
-          <p class="text-sm">This date is completely free!</p>
-        </div>
-      `;
-    } else {
-      modalBody.innerHTML = events.map(event => {
+    // Get booked slot times
+    const bookedTimes = bookedEvents.map(event => event.extendedProps.startTime).sort();
+    
+    // Find available slots
+    const available = availableSlots.filter(slot => !bookedTimes.includes(slot));
+
+    let html = '';
+
+    // Show booked events first
+    if (bookedEvents.length > 0) {
+      html += bookedEvents.map(event => {
         const startTime = formatTime(event.extendedProps.startTime);
         const endTime = formatTime(event.extendedProps.endTime);
         const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
@@ -499,15 +520,57 @@ document.addEventListener('DOMContentLoaded', function () {
             <h3 class="event-name">${event.title}</h3>
             <div class="event-status">
               <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-              Booked • ${timeSlots.includes(startTime) ? '9AM-3PM slot' : 'Custom time'}
+              Booked • ${availableSlots.includes(event.extendedProps.startTime) ? '9AM-3PM slot' : 'Custom time'}
             </div>
           </div>
         `;
       }).join('');
     }
 
+    // Show available slots
+    if (available.length > 0) {
+      html += `
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
+          <h4 style="font-size: 18px; font-weight: 700; color: #166534; margin-bottom: 16px;">
+            ✅ Available Slots (Click to Book)
+          </h4>
+      `;
+
+      available.forEach(slot => {
+        html += `
+          <div class="event-item free" style="cursor: pointer;" onclick="bookSlot('${dateStr.replace(/-/g, '/')}','${slot}')">
+            <div class="event-time">${slot}</div>
+            <h3 class="event-name">Free Slot</h3>
+            <div class="event-status">
+              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              Available • 9AM-3PM
+            </div>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+    } else if (bookedEvents.length === 0) {
+      html = `
+        <div class="no-events">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Completely Free!</h3>
+          <p class="text-sm">Click any available slot above to book.</p>
+        </div>
+      `;
+    }
+
+    modalBody.innerHTML = html;
     modal.style.display = 'block';
   }
+
+  // 🔥 BOOK SLOT FUNCTION (Global for onclick)
+  window.bookSlot = function(date, slot) {
+    const hallNameEncoded = encodeURIComponent(hallName);
+    window.location.href = `registration.html?hall=${hallNameEncoded}&date=${date}&slot=${encodeURIComponent(slot)}`;
+  };
 
   function formatTime(timeStr) {
     if (!timeStr || timeStr.includes('AM') || timeStr.includes('PM')) return timeStr;
