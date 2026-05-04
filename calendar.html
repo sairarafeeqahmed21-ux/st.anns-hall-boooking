@@ -240,8 +240,6 @@ document.addEventListener('DOMContentLoaded', function () {
     throw new Error("Invalid hall");
   }
 
-  console.log("✅ Selected Hall:", hallName);
-
   // ✅ UI CONFIG
   const hallConfig = {
     "Seminar Hall 1": { capacity: "80 seats", emoji: "📚" },
@@ -258,50 +256,56 @@ document.addEventListener('DOMContentLoaded', function () {
   let calendarEvents = [];
   let calendar;
 
-  // ✅ FIREBASE QUERY - FIXED (only eventName, no time)
+  // ✅ FIREBASE QUERY - FIXED TIME & NO "5 NUMBERS"
   const q = query(
     collection(db, "bookings"),
     where("hall", "==", hallName)
   );
-onSnapshot(q, (snapshot) => {
-  calendarEvents = [];
 
-  snapshot.forEach((doc) => {
-    const data = doc.data();
+  onSnapshot(q, (snapshot) => {
+    calendarEvents = [];
 
-    if (!data.date || !data.eventName) return;
+    snapshot.forEach((doc) => {
+      const data = doc.data();
 
-    let eventDate;
+      if (!data.date || !data.eventName) return;
 
-    if (typeof data.date === "string") {
-      eventDate = new Date(data.date.replace(/\//g, '-'));
-    } else if (data.date?.toDate) {
-      eventDate = data.date.toDate();
-    }
+      let eventDate;
 
-    if (!isNaN(eventDate)) {
-      calendarEvents.push({
-        id: doc.id,
-        title: data.eventName, // ✅ Only event name on calendar
-        start: eventDate,
-        extendedProps: {
-          startTime: data.startTime || "All Day", // ✅ Time for popup
-          endTime: data.endTime || "",
-          organizer: data.fullName || "Unknown"
-        }
-      });
+      if (typeof data.date === "string") {
+        eventDate = new Date(data.date.replace(/\//g, '-'));
+      } else if (data.date?.toDate) {
+        eventDate = data.date.toDate();
+      }
+
+      if (!isNaN(eventDate)) {
+        // ✅ CLEAN TIME FORMAT (AM/PM from registration)
+        const startTime = data.startTime || "All Day";
+        const endTime = data.endTime || "";
+
+        calendarEvents.push({
+          id: doc.id,
+          title: data.eventName, // ✅ ONLY EVENT NAME ON CALENDAR
+          start: eventDate,
+          display: 'block', // ✅ Force display
+          extendedProps: {
+            startTime: startTime, // ✅ Exact time from registration (10:00 AM)
+            endTime: endTime,
+            organizer: data.fullName || "Unknown"
+          }
+        });
+      }
+    });
+
+    console.log(`📊 ${calendarEvents.length} events loaded for ${hallName}`);
+
+    if (calendar) {
+      calendar.removeAllEvents();
+      calendar.addEventSource(calendarEvents);
     }
   });
 
-  console.log(`📊 ${calendarEvents.length} events loaded for ${hallName}`);
-
-  if (calendar) {
-    calendar.removeAllEvents();
-    calendar.addEventSource(calendarEvents);
-  }
-});
-
-  // ✅ INIT CALENDAR - FIXED EVENT HANDLING
+  // ✅ INIT CALENDAR - PERMANENTLY FIXED
   const calendarEl = document.getElementById('calendar');
 
   calendar = new FullCalendar.Calendar(calendarEl, {
@@ -316,17 +320,16 @@ onSnapshot(q, (snapshot) => {
 
     events: calendarEvents,
 
-   
-    // Replace ONLY the eventClick function in the script:
+    // ✅ PERFECT EVENT CLICK - EVENT NAME + AM/PM TIME
+    eventClick: function(info) {
+      const eventName = info.event.title;
+      const startTime = info.event.extendedProps.startTime || "All Day";
+      const endTime = info.event.extendedProps.endTime || "";
+      const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
+      
+      alert(`🔴 BOOKED\n\n📋 Event: ${eventName}\n🕐 Time: ${timeRange}`);
+    },
 
-eventClick: function(info) {
-  const eventName = info.event.title;
-  const startTime = info.event.extendedProps.startTime || "Time not specified";
-  const endTime = info.event.extendedProps.endTime || "";
-  const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
-  
-  alert(`🔴 BOOKED\n\n📋 Event: ${eventName}\n🕐 Time: ${timeRange}`);
-},
     // ✅ CLICK FREE DATE TO BOOK
     dateClick: function(info) {
       const today = new Date();
@@ -340,13 +343,12 @@ eventClick: function(info) {
         return;
       }
 
-      // ✅ Check if date has events
       const eventsOnDate = calendar.getEvents().filter(e =>
         e.start.toDateString() === clickedDate.toDateString()
       );
 
       if (eventsOnDate.length > 0) {
-        alert("🔴 This date is already booked!\n\nClick the red event dot to see details.");
+        alert("🔴 This date is already booked!\n\nClick the red event to see details.");
         return;
       }
 
@@ -357,9 +359,16 @@ eventClick: function(info) {
     },
 
     eventDidMount: function(info) {
-      // Add click cursor to events
+      // ✅ PERFECT EVENT STYLING - NO "5 NUMBERS"
       info.el.style.cursor = 'pointer';
+      info.el.style.display = 'block';
       info.el.title = `${info.event.title}`;
+      
+      // ✅ Force clean display - remove any time text
+      const eventElements = info.el.querySelectorAll('.fc-event-title');
+      eventElements.forEach(el => {
+        el.textContent = info.event.title;
+      });
     }
   });
 
