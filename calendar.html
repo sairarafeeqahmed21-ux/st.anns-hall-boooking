@@ -289,13 +289,37 @@ document.addEventListener('DOMContentLoaded', function () {
     eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false }, // 🔥 HIDE TIME
     dayMaxEvents: 3,
     eventClick: function(info) {
-      const eventName = info.event.title;
-      const startTime = info.event.extendedProps.startTime || "All Day";
-      const endTime = info.event.extendedProps.endTime || "";
-      const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
-      
-      alert(`🔴 BOOKED\n\n📋 Event: ${eventName}\n🕐 Time: ${timeRange}`);
-    },
+  const eventName = info.event.title;
+  
+  // 🔥 FIX AM/PM - WORKS WITH ANY FORMAT
+  let startTime = info.event.extendedProps.time || info.event.extendedProps.startTime || "All Day";
+  let endTime = info.event.extendedProps.endTime || "";
+  
+  // 🔥 CONVERT TO PROPER AM/PM
+  const formatTime = (timeStr) => {
+    if (!timeStr || timeStr.includes('AM') || timeStr.includes('PM')) return timeStr;
+    
+    try {
+      const [hours, minutes] = timeStr.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours), parseInt(minutes) || 0, 0, 0);
+      return date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit', 
+        hour12: true 
+      });
+    } catch(e) {
+      return timeStr;
+    }
+  };
+  
+  startTime = formatTime(startTime);
+  endTime = formatTime(endTime);
+  
+  const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
+  
+  alert(`🔴 BOOKED\n\n📋 Event: ${eventName}\n🕐 Time: ${timeRange}`);
+},
     dateClick: function(info) {
       const today = new Date();
       today.setHours(0,0,0,0);
@@ -344,16 +368,18 @@ document.addEventListener('DOMContentLoaded', function () {
       let eventDate = new Date(data.date.replace(/\//g, '-'));
       if (isNaN(eventDate)) return;
 
-      calendar.addEvent({
-        id: doc.id,
-        title: data.eventName, // ✅ ONLY NAME
-        start: eventDate,
-        display: 'auto',
-        extendedProps: {
-          startTime: data.startTime || "All Day",
-          endTime: data.endTime || ""
-        }
-      });
+     calendar.addEvent({
+  id: doc.id,
+  title: data.eventName, // ✅ ONLY NAME
+  start: eventDate,
+  display: 'auto',
+  extendedProps: {
+    time: data.startTime || "All Day",     // 🔥 ADD THIS LINE
+    startTime: data.startTime || "All Day",
+    endTime: data.endTime || ""
+  }
+});
+  
     });
   });
 });
