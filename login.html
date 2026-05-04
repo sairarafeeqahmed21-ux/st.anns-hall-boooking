@@ -1,16 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- ALL YOUR EXISTING HEAD CONTENT -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusHalls</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass { 
+      backdrop-filter: blur(50px); 
+      background: rgba(255,255,255,0.1); 
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    }
+    .glass-input {
+      backdrop-filter: blur(30px);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .glass-input:focus {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.4);
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+    }
+    @keyframes float1 {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    @keyframes float2 {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(90deg); }
+    }
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+      50% { box-shadow: 0 0 40px rgba(255,255,255,0.3); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: scale(0.95); }
+    }
+  </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 min-h-screen flex items-center justify-center p-8 relative overflow-hidden">
   
-  <!-- ALL YOUR EXISTING HTML CONTENT -->
+  <!-- Background Decorations -->
+  <div class="absolute inset-0">
+    <div class="absolute top-20 left-20 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-float1" style="animation-duration: 20s;"></div>
+    <div class="absolute bottom-20 right-20 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl animate-float2" style="animation-duration: 25s;"></div>
+    <div class="absolute top-1/2 left-10 w-48 h-48 bg-purple-400/5 rounded-full blur-2xl" style="animation: float1 15s infinite;"></div>
+  </div>
 
-<script>
-  // Password Toggle - ALL YOUR EXISTING CODE...
+  <!-- Main Glass Card -->
+  <div id="loginCard" class="w-full max-w-md glass rounded-3xl p-10 shadow-2xl relative z-10 glow" style="animation: glow 3s infinite;">
+    
+    <!-- Login Title -->
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent mb-2">CampusHalls</h1>
+      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 px-4 py-2 rounded-full text-white/80 text-sm font-medium backdrop-blur-sm">
+        <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+        <span id="hallName">Calendar Access</span>
+      </div>
+    </div>
 
-  // ✅ FIXED HALL VALIDATION
+    <!-- Login Form -->
+    <form id="loginForm">
+      <!-- Password Input with Eye Icon -->
+      <div class="relative mb-8">
+        <input type="password" id="password" required 
+               class="w-full glass-input rounded-2xl px-12 py-5 text-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all duration-300 pr-14 h-14"
+               placeholder="Password"
+               autocomplete="off">
+        
+        <!-- Eye Icon -->
+        <button type="button" id="togglePassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors p-1">
+          <svg id="eyeIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          <svg id="eyeSlashIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Login Button -->
+      <button type="submit" id="submitBtn"
+              class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-5 px-8 rounded-2xl font-semibold text-lg shadow-xl hover:shadow-2xl hover:shadow-emerald-500/25 transition-all duration-300 backdrop-blur-sm border border-white/20 flex items-center justify-center gap-2 h-14 group">
+        <span id="loginText">Login to CampusHalls</span>
+        <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin hidden group-hover:animate-spin" id="spinner"></div>
+      </button>
+    </form>
+
+    <div class="text-center mt-6 pt-6 border-t border-white/10">
+      <div class="text-xs text-white/50">Secure Campus Access</div>
+    </div>
+  </div>
+
+  <!-- Success Message Overlay -->
+  <div id="successOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="glass p-12 rounded-3xl text-center max-w-md w-full mx-4">
+      <div class="w-24 h-24 bg-emerald-400/20 border-4 border-emerald-400/50 rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg class="w-12 h-12 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-white mb-4">Welcome to CampusHalls!</h2>
+      <p class="text-white/80 mb-8">Full access granted. Redirecting...</p>
+    </div>
+  </div>
+
+ <script>
+  // Password Toggle
+  const passwordInput = document.getElementById('password');
+  const togglePasswordBtn = document.getElementById('togglePassword');
+  const eyeIcon = document.getElementById('eyeIcon');
+  const eyeSlashIcon = document.getElementById('eyeSlashIcon');
+
+  togglePasswordBtn.addEventListener('click', function() {
+    const type = passwordInput.type === 'password' ? 'text' : 'password';
+    passwordInput.type = type;
+
+    eyeIcon.classList.toggle('hidden');
+    eyeSlashIcon.classList.toggle('hidden');
+  });
+
+  // ✅ GET HALL FROM URL
   const urlParams = new URLSearchParams(window.location.search);
   let hallName = urlParams.get('hall');
 
@@ -22,26 +141,96 @@
 
   hallName = decodeURIComponent(hallName).trim();
 
-  // ✅ NEW VALID HALLS - MATCHES INDEX.HTML
+  // ✅ VALIDATE HALL - UPDATED WITH NEW NAMES
   const validHalls = [
     "Deickmann Hall",
-    "Gnanamma Hall", 
-    "St.Josephs auditorium"
+    "Gnanamma Hall",
+    "St.Joseph's Auditorium"
   ];
 
   if (!validHalls.includes(hallName)) {
-    alert(`❌ Invalid hall: "${hallName}"`);
+    alert(`❌ Invalid hall selected: "${hallName}". Please go back and choose a valid hall.`);
     window.location.href = "index.html#availability";
     throw new Error("Invalid hall");
   }
 
   console.log("✅ Selected Hall:", hallName);
+
+  // Update UI
   document.getElementById('hallName').textContent = hallName;
 
-  // REST OF YOUR CODE REMAINS SAME...
+  // ✅ ONE-TIME GLOBAL LOGIN CHECK
+  function checkGlobalLogin() {
+    const isGloballyLoggedIn = localStorage.getItem('campusHallsGlobalLogin') === 'true';
+    
+    if (isGloballyLoggedIn) {
+      console.log("✅ Globally logged in - skipping login!");
+      autoRedirect();
+      return true;
+    }
+    return false;
+  }
+
+  // ✅ AUTO REDIRECT FUNCTION
+  function autoRedirect() {
+    const loginCard = document.getElementById('loginCard');
+    const successOverlay = document.getElementById('successOverlay');
+    
+    // Hide login card instantly
+    loginCard.style.display = 'none';
+    successOverlay.classList.remove('hidden');
+    
+    const redirectUrl = `calendar.html?hall=${encodeURIComponent(hallName)}`;
+    console.log("🚀 Auto-redirecting to:", redirectUrl);
+    
+    setTimeout(() => {
+      window.location.href = redirectUrl;
+    }, 1200);
+  }
+
+  // Password
   const PASSWORD = 'stanns123';
-  
-  // ALL YOUR EXISTING LOGIN LOGIC...
+
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const input = document.getElementById('password');
+    const btn = document.getElementById('submitBtn');
+    const spinner = document.getElementById('spinner');
+    const loginText = document.getElementById('loginText');
+
+    if (input.value !== PASSWORD) {
+      input.style.animation = 'shake 0.5s';
+      input.style.borderColor = 'rgb(239,68,68)';
+      setTimeout(() => {
+        input.style.animation = '';
+        input.style.borderColor = '';
+      }, 500);
+      return;
+    }
+
+    // ✅ SET GLOBAL LOGIN (ONE-TIME FOR WHOLE WEBSITE)
+    localStorage.setItem('campusHallsGlobalLogin', 'true');
+    console.log("✅ Global login set - no more login screens!");
+
+    // Show loading
+    btn.disabled = true;
+    spinner.classList.remove('hidden');
+    loginText.textContent = 'Access Granted!';
+
+    // Auto redirect
+    setTimeout(() => {
+      autoRedirect();
+    }, 800);
+  });
+
+  // ✅ CHECK GLOBAL LOGIN ON PAGE LOAD (INSTANT)
+  window.addEventListener('load', function() {
+    // Check immediately - no delay!
+    if (!checkGlobalLogin()) {
+      passwordInput.focus();
+    }
+  });
 </script>
 </body>
 </html>
