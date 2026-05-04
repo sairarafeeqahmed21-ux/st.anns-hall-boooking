@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function () {
   hallName = decodeURIComponent(hallName).trim();
 
   // 🔥 UPDATED HALL NAMES & CAPACITIES
-  const validHalls = ["Deickmann Hall", "Gnanamma Hall", "St.Joseph's auditorium"];
+  const validHalls = ["Deickmann Hall", "Gnanamma Hall", "St.Joseph's Auditorium"];
   if (!validHalls.includes(hallName)) {
     alert("❌ Invalid hall.");
     window.location.href = "index.html#availability";
@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const hallConfig = {
     "Deickmann Hall": { capacity: "200 seats", emoji: "📚" },
     "Gnanamma Hall": { capacity: "200 seats", emoji: "📖" },
-    "St.Joseph's auditorium": { capacity: "800 seats", emoji: "🎭" }
+    "St.Joseph's Auditorium": { capacity: "800 seats", emoji: "🎭" }
   };
 
   const config = hallConfig[hallName];
