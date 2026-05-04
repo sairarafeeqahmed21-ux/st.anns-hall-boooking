@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Campus Halls - Calendar</title>
+<!-- 🔥 LOGO & FAVICON -->
+<link rel="icon" type="image/png" href="https://via.placeholder.com/32x32/14b8a6/ffffff?text=CH">
+<link rel="apple-touch-icon" href="https://via.placeholder.com/76x76/14b8a6/ffffff?text=CH">
+<link rel="shortcut icon" href="https://via.placeholder.com/32x32/14b8a6/ffffff?text=CH">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
@@ -193,7 +197,11 @@ body { font-family: 'Inter', sans-serif; }
 <!-- HEADER -->
 <header class="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
   <a href="index.html#home" class="flex items-center gap-3 hover:scale-105 transition-transform">
-    <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl shadow-lg"></div>
+    <!-- 🔥 ACTUAL LOGO IMAGE INSTEAD OF COLORED DIV -->
+    <img src="https://via.placeholder.com/40x40/14b8a6/ffffff?text=CH" 
+         alt="CampusHalls Logo" 
+         class="w-10 h-10 rounded-xl shadow-lg object-cover"
+         loading="lazy">
     <h1 class="text-lg font-semibold text-gray-900">CampusHalls</h1>
   </a>
   <nav class="space-x-6 text-gray-600 font-medium text-sm">
