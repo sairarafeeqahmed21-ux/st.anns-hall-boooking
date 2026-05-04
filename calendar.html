@@ -202,8 +202,7 @@ body { font-family: 'Inter', sans-serif; }
         <div class="footer-logo">
           <img src="https://ik.imagekit.io/syustaging/SYU_PREPROD/LOGO_Zd7PFpkXn.webp?tr=w-3840" 
                alt="St.Anns Logo" 
-               class="w-12 h-12 rounded-2xl shadow-lg object-cover bg-white p-2"
-               loading="lazy">
+               class="w-12 h-12 rounded-2xl shadow-lg object-cover bg-white p-1">
         </div>
         <h3 class="font-bold text-2xl text-gray-900">St.Anns Halls</h3>
       </div>
@@ -216,7 +215,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA1VE0YP88fk7tJ-NynBt_A0dNnoMyVi44",
+  apiKey: "YOUR_KEY",
   authDomain: "hall-booking-de99d.firebaseapp.com",
   projectId: "hall-booking-de99d",
   storageBucket: "hall-booking-de99d.firebasestorage.app",
@@ -228,81 +227,48 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 document.addEventListener('DOMContentLoaded', function () {
+
   const urlParams = new URLSearchParams(window.location.search);
-  let hallName = urlParams.get('hall');
+  let hallName = decodeURIComponent(urlParams.get('hall') || "").trim();
 
   if (!hallName) {
-    alert("❌ No hall selected.");
+    alert("No hall selected");
     window.location.href = "index.html#availability";
     return;
   }
-
-  hallName = decodeURIComponent(hallName).trim();
-
-  const validHalls = ["Deickmann Hall", "Gnanamma Hall", "St.Joseph's Auditorium"];
-  if (!validHalls.includes(hallName)) {
-    alert("❌ Invalid hall.");
-    window.location.href = "index.html#availability";
-    return;
-  }
-
-  const hallConfig = {
-    "Deickmann Hall": { capacity: "200 seats", emoji: "📚" },
-    "Gnanamma Hall": { capacity: "200 seats", emoji: "📖" },
-    "St.Joseph's Auditorium": { capacity: "800 seats", emoji: "🎭" }
-  };
-
-  const config = hallConfig[hallName];
-  document.getElementById('hallTitle').textContent = `${config.emoji} ${hallName}`;
-  document.getElementById('hallInfo').textContent = `Capacity: ${config.capacity} • Click FREE dates to book | RED DOT = Fully Booked`;
-
-  let calendar;
 
   const calendarEl = document.getElementById('calendar');
-  
-  calendar = new FullCalendar.Calendar(calendarEl, {
+
+  const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
     height: "auto",
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth,dayGridWeek'
-    },
-    timeZone: 'UTC',
-    dayMaxEvents: 99,
+
     dateClick: function(info) {
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      const clickedDate = new Date(info.dateStr);
-      clickedDate.setHours(0,0,0,0);
+      const clickedDate = info.dateStr;
 
-      if (clickedDate < today) {
-        alert("❌ Cannot book past dates");
-        return;
-      }
-
-      // Check if date has any events (booked)
-      const eventsOnDate = calendar.getEvents().filter(e =>
-        e.start.toDateString() === clickedDate.toDateString()
+      const events = calendar.getEvents().filter(e =>
+        e.startStr.startsWith(clickedDate)
       );
 
-      if (eventsOnDate.length > 0) {
-        alert("❌ This date is fully booked!");
-        return;
+      if (events.length > 0) {
+        let msg = `🔴 Booked (9AM–3PM):\n\n`;
+        events.forEach(e => msg += `• ${e.title}\n`);
+        alert(msg);
+      } else {
+        // simple availability
+        window.location.href = `registration.html?hall=${encodeURIComponent(hallName)}&date=${clickedDate}`;
       }
-
-      // No events = fully available - go to booking
-      const formattedDate = info.dateStr.replace(/-/g, '/');
-      window.location.href = `registration.html?hall=${encodeURIComponent(hallName)}&date=${formattedDate}`;
     },
-    dayRender: function(info) {
-      // Mark days with events for red dot
-      const eventsOnDate = calendar.getEvents().filter(e =>
-        e.start.toDateString() === info.date.toDateString()
+
+    dayCellDidMount: function(info) {
+      const dateStr = info.date.toISOString().split('T')[0];
+
+      const events = calendar.getEvents().filter(e =>
+        e.startStr.startsWith(dateStr)
       );
-      if (eventsOnDate.length > 0) {
-        info.el.dataset.events = "true";
-        info.el.classList.add('has-events');
+
+      if (events.length > 0) {
+        info.el.classList.add('has-events'); // 🔴 RED DOT WORKS NOW
       }
     }
   });
@@ -310,28 +276,26 @@ document.addEventListener('DOMContentLoaded', function () {
   calendar.render();
 
   const q = query(collection(db, "bookings"), where("hall", "==", hallName));
-  
+
   onSnapshot(q, (snapshot) => {
     calendar.removeAllEvents();
 
     snapshot.forEach((doc) => {
       const data = doc.data();
+
       if (!data.date || !data.eventName) return;
 
-      let eventDate = new Date(data.date.replace(/\//g, '-'));
-      if (isNaN(eventDate)) return;
+      const formattedDate = data.date.replace(/\//g, '-');
 
       calendar.addEvent({
-        id: doc.id,
         title: data.eventName,
-        start: eventDate,
-        display: 'background' // Use background events to trigger has-events
+        start: formattedDate
       });
     });
 
-    // Re-render to update dayRender
-    calendar.refetchEvents();
+    calendar.render(); // 🔥 IMPORTANT: re-render to update red dots
   });
+
 });
 </script>
 </body>
