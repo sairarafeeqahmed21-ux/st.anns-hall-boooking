@@ -131,6 +131,7 @@ body { font-family: 'Inter', sans-serif; }
   box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5);
   z-index: 15;
   animation: pulse 2s infinite;
+  cursor: pointer;
 }
 
 .has-multiple-events .fc-daygrid-day-top::after {
@@ -152,7 +153,7 @@ body { font-family: 'Inter', sans-serif; }
   display: none !important;
 }
 
-/* 🔥 MODAL STYLES - SIMPLE EVENT LIST */
+/* 🔥 MODAL STYLES */
 .booking-modal {
   display: none;
   position: fixed;
@@ -284,10 +285,10 @@ body { font-family: 'Inter', sans-serif; }
       ← Back to Halls
     </a>
     <h2 class="text-2xl font-semibold" id="hallTitle">Deickmann Hall</h2>
-    <p class="text-gray-500 text-sm mt-1" id="hallInfo">Capacity: 200 seats • Click FREE dates (9AM-3PM) to book | Click 🔴 for event details</p>
+    <p class="text-gray-500 text-sm mt-1" id="hallInfo">Capacity: 200 seats • Click FREE dates to book | Click 🔴 RED DOT for event details</p>
     <div class="flex gap-3 mt-4">
-      <span class="px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs flex items-center gap-1">+ Available (9AM-3PM)</span>
-      <span class="px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs flex items-center gap-1">🔴 Booked</span>
+      <span class="px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs flex items-center gap-1">+ Available</span>
+      <span class="px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs flex items-center gap-1">🔴 Click Red Dot</span>
     </div>
   </div>
 
@@ -296,7 +297,7 @@ body { font-family: 'Inter', sans-serif; }
   </div>
 </div>
 
-<!-- 🔥 EVENTS MODAL - JUST SHOW EVENTS -->
+<!-- 🔥 EVENTS MODAL -->
 <div id="eventsModal" class="booking-modal">
   <div class="modal-content">
     <div class="modal-header">
@@ -341,20 +342,22 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+let hallNameGlobal; // Global for modal access
+
 document.addEventListener('DOMContentLoaded', function () {
   const urlParams = new URLSearchParams(window.location.search);
-  let hallName = urlParams.get('hall');
+  hallNameGlobal = urlParams.get('hall');
 
-  if (!hallName) {
+  if (!hallNameGlobal) {
     alert("❌ No hall selected.");
     window.location.href = "index.html#availability";
     return;
   }
 
-  hallName = decodeURIComponent(hallName).trim();
+  hallNameGlobal = decodeURIComponent(hallNameGlobal).trim();
 
   const validHalls = ["Deickmann Hall", "Gnanamma Hall", "St.Joseph's Auditorium"];
-  if (!validHalls.includes(hallName)) {
+  if (!validHalls.includes(hallNameGlobal)) {
     alert("❌ Invalid hall.");
     window.location.href = "index.html#availability";
     return;
@@ -366,9 +369,9 @@ document.addEventListener('DOMContentLoaded', function () {
     "St.Joseph's Auditorium": { capacity: "800 seats", emoji: "🎭" }
   };
 
-  const config = hallConfig[hallName];
-  document.getElementById('hallTitle').textContent = `${config.emoji} ${hallName}`;
-  document.getElementById('hallInfo').textContent = `Capacity: ${config.capacity} • Click FREE dates (9AM-3PM) to book | Click 🔴 for event details`;
+  const config = hallConfig[hallNameGlobal];
+  document.getElementById('hallTitle').textContent = `${config.emoji} ${hallNameGlobal}`;
+  document.getElementById('hallInfo').textContent = `Capacity: ${config.capacity} • Click FREE dates to book | Click 🔴 RED DOT for event details`;
 
   let calendar;
 
@@ -396,10 +399,9 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      // 🔥 ALWAYS GO TO BOOKING PAGE - EVEN IF HAS EVENTS
-      // User can book remaining time slots in registration page
+      // 🔥 FREE DATE OR PARTIALLY BOOKED - GO TO BOOKING
       const formattedDate = info.dateStr.replace(/-/g, '/');
-      window.location.href = `registration.html?hall=${encodeURIComponent(hallName)}&date=${formattedDate}`;
+      window.location.href = `registration.html?hall=${encodeURIComponent(hallNameGlobal)}&date=${formattedDate}`;
     },
     eventDidMount: function(info) {
       info.el.style.display = 'none';
@@ -409,7 +411,7 @@ document.addEventListener('DOMContentLoaded', function () {
   calendar.render();
 
   // 🔥 LOAD EVENTS & ADD RED DOTS
-  const q = query(collection(db, "bookings"), where("hall", "==", hallName));
+  const q = query(collection(db, "bookings"), where("hall", "==", hallNameGlobal));
   
   onSnapshot(q, (snapshot) => {
     calendar.removeAllEvents();
@@ -428,16 +430,17 @@ document.addEventListener('DOMContentLoaded', function () {
         display: 'none',
         extendedProps: {
           startTime: data.startTime,
-          endTime: data.endTime || data.startTime
+          endTime: data.endTime || data.startTime,
+          docId: doc.id
         }
       });
     });
 
-    updateDayIndicators();
+    updateDayIndicators(calendar);
   });
 
-  // 🔥 UPDATE DAY INDICATORS (RED DOTS)
-  function updateDayIndicators() {
+  // 🔥 UPDATE DAY INDICATORS WITH CLICKABLE RED DOTS
+  function updateDayIndicators(calendar) {
     document.querySelectorAll('.fc-daygrid-day').forEach(dayEl => {
       const dateStr = dayEl.getAttribute('data-date');
       const events = calendar.getEvents().filter(e => 
@@ -451,18 +454,62 @@ document.addEventListener('DOMContentLoaded', function () {
         if (events.length > 1) {
           dayEl.classList.add('has-multiple-events');
         }
+        
+        // 🔥 MAKE RED DOT CLICKABLE
+        dayEl.querySelector('.fc-daygrid-day-top').onclick = (e) => {
+          e.stopPropagation();
+          showEventsModal(dateStr, events);
+        };
       }
     });
   }
 
-  // 🔥 EVENTS MODAL - SIMPLIFIED (Just show events, no extra logic)
+  // 🔥 EVENTS MODAL - SHOWS ON RED DOT CLICK
   const modal = document.getElementById('eventsModal');
   const closeBtn = document.getElementById('closeModal');
   const modalTitle = document.getElementById('modalDateTitle');
   const modalBody = document.getElementById('modalBody');
 
-  // 🔥 MODAL IS NOT USED ANYMORE - BUT KEPT FOR RED DOT VISUAL
-  // dateClick now goes directly to booking page always
+  function showEventsModal(dateStr, events) {
+    const date = new Date(dateStr);
+    modalTitle.textContent = date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    if (events.length === 0) {
+      modalBody.innerHTML = `
+        <div class="no-events">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">No events</h3>
+          <p class="text-sm">This date is completely free!</p>
+        </div>
+      `;
+    } else {
+      modalBody.innerHTML = events.map(event => {
+        const startTime = formatTime(event.extendedProps.startTime);
+        const endTime = formatTime(event.extendedProps.endTime);
+        const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
+        
+        return `
+          <div class="event-item">
+            <div class="event-time">${timeRange}</div>
+            <h3 class="event-name">${event.title}</h3>
+            <div class="event-status">
+              <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+              Booked
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    modal.style.display = 'block';
+  }
 
   function formatTime(timeStr) {
     if (!timeStr || timeStr.includes('AM') || timeStr.includes('PM')) return timeStr;
@@ -481,7 +528,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // 🔥 MODAL CLOSE HANDLERS (KEPT FOR CLEANUP)
+  // 🔥 MODAL CLOSE HANDLERS
   closeBtn.onclick = () => modal.style.display = 'none';
   window.onclick = (event) => {
     if (event.target === modal) modal.style.display = 'none';
