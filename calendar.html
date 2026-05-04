@@ -95,7 +95,6 @@ body { font-family: 'Inter', sans-serif; }
   z-index: 3;
   line-height: 1;
 }
-.fc-daygrid-day-past { background: #f8fafc; opacity: 0.6; }
 .fc-day-today {
   background: transparent !important;
   position: relative;
@@ -117,78 +116,138 @@ body { font-family: 'Inter', sans-serif; }
   margin: 4px auto 0;
   box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
 }
+
+/* 🔥 RED DOT FOR BOOKED DAYS - MULTIPLE EVENTS */
 .has-events::after {
   content: '';
   position: absolute;
   top: 8px;
   right: 8px;
-  width: 12px;
-  height: 12px;
-  background: #ef4444;
-  border: 2px solid #ffffff;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border: 3px solid #ffffff;
   border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 3px 10px rgba(239, 68, 68, 0.5);
   z-index: 10;
   animation: pulse 2s infinite;
 }
 @keyframes pulse {
-  0% { box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4); }
-  50% { box-shadow: 0 2px 12px rgba(239, 68, 68, 0.7); }
-  100% { box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4); }
+  0% { box-shadow: 0 3px 10px rgba(239, 68, 68, 0.5); }
+  50% { box-shadow: 0 3px 16px rgba(239, 68, 68, 0.8); }
+  100% { box-shadow: 0 3px 10px rgba(239, 68, 68, 0.5); }
 }
-.fc-event { 
-  display: none !important; 
-  cursor: pointer !important;
-}
-.fc-scrollgrid { border: none !important; }
+
+/* 🔥 HIDE ALL EVENTS - ONLY SHOW RED DOT */
 .fc-daygrid-event {
-  display: block !important;
-  font-size: 11px !important;
-  padding: 2px 6px !important;
-  margin: 1px !important;
-  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 6px !important;
-  font-weight: 600 !important;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  max-width: calc(100% - 4px) !important;
-}
-.fc-daygrid-event:hover {
-  transform: scale(1.05) !important;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5) !important;
-}
-  /* 🔥 PERMANENTLY KILL 5:30 TIME BUG */
-.fc-event-time { 
-  display: none !important; 
-  visibility: hidden !important; 
-  font-size: 0 !important; 
-  height: 0 !important; 
-  width: 0 !important; 
-  opacity: 0 !important; 
+  display: none !important;
 }
 
-.fc-event-title-container .fc-event-title {
-  display: block !important;
+/* 🔥 MODAL STYLES */
+.booking-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  backdrop-filter: blur(4px);
 }
-
-.fc-daygrid-event .fc-event-main {
-  padding: 2px 6px !important;
-  font-size: 11px !important;
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+  animation: modalSlideIn 0.3s ease-out;
 }
-
-/* Kill any time display completely */
-.fc-event-main-frame {
-  display: flex !important;
-  flex-direction: column !important;
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: translate(-50%, -60%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
 }
-
-.fc-event-title {
-  margin: 0 !important;
-  line-height: 1.2 !important;
+.modal-header {
+  padding: 24px 24px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #64748b;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+.close-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+.modal-body {
+  padding: 24px;
+}
+.event-item {
+  background: linear-gradient(135deg, #fef2f2 0%, #fde8e8 100%);
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+.event-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+}
+.event-time {
+  font-size: 18px;
+  font-weight: 700;
+  color: #dc2626;
+  margin-bottom: 4px;
+}
+.event-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+}
+.event-status {
+  font-size: 14px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.no-events {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+}
+.no-events svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
 }
 </style>
 </head>
@@ -197,7 +256,6 @@ body { font-family: 'Inter', sans-serif; }
 <!-- HEADER -->
 <header class="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
   <a href="index.html#home" class="flex items-center gap-3 hover:scale-105 transition-transform">
-    <!-- 🔥 ACTUAL LOGO IMAGE INSTEAD OF COLORED DIV -->
     <img src="https://ik.imagekit.io/syustaging/SYU_PREPROD/LOGO_Zd7PFpkXn.webp?tr=w-3840" 
          alt="CampusHalls Logo" 
          class="w-10 h-10 rounded-xl shadow-lg object-cover"
@@ -217,15 +275,28 @@ body { font-family: 'Inter', sans-serif; }
       ← Back to Halls
     </a>
     <h2 class="text-2xl font-semibold" id="hallTitle">Deickmann Hall</h2>
-    <p class="text-gray-500 text-sm mt-1" id="hallInfo">Capacity: 200 seats • Click FREE dates to book | Click BOOKED events to view details</p>
+    <p class="text-gray-500 text-sm mt-1" id="hallInfo">Capacity: 200 seats • Click FREE dates (9AM-3PM) to book | Click 🔴 for event details</p>
     <div class="flex gap-3 mt-4">
-      <span class="px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs flex items-center gap-1">+ Available</span>
+      <span class="px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs flex items-center gap-1">+ Available (9AM-3PM)</span>
       <span class="px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs flex items-center gap-1">🔴 Booked</span>
     </div>
   </div>
 
   <div class="bg-white px-4 md:px-8 py-8">
     <div id="calendar"></div>
+  </div>
+</div>
+
+<!-- 🔥 EVENTS MODAL -->
+<div id="eventsModal" class="booking-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalDateTitle">Date</h2>
+      <button class="close-btn" id="closeModal">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- Events will be populated here -->
+    </div>
   </div>
 </div>
 
@@ -240,10 +311,10 @@ body { font-family: 'Inter', sans-serif; }
                loading="lazy">
         </div>
         <h3 class="font-bold text-2xl">St.Anns Halls</h3>
-      </div>
+    </div>
       <p class="text-sm opacity-90">© 2026 St.Anns Halls. All rights reserved.</p>
     </div>
-  </footer>
+</footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -273,7 +344,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   hallName = decodeURIComponent(hallName).trim();
 
-  // 🔥 UPDATED HALL NAMES & CAPACITIES
   const validHalls = ["Deickmann Hall", "Gnanamma Hall", "St.Joseph's Auditorium"];
   if (!validHalls.includes(hallName)) {
     alert("❌ Invalid hall.");
@@ -281,7 +351,6 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
-  // 🔥 UPDATED HALL CONFIG WITH NEW CAPACITIES
   const hallConfig = {
     "Deickmann Hall": { capacity: "200 seats", emoji: "📚" },
     "Gnanamma Hall": { capacity: "200 seats", emoji: "📖" },
@@ -290,13 +359,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const config = hallConfig[hallName];
   document.getElementById('hallTitle').textContent = `${config.emoji} ${hallName}`;
-  document.getElementById('hallInfo').textContent = `Capacity: ${config.capacity} • Click FREE dates to book | Click BOOKED events to view details`;
+  document.getElementById('hallInfo').textContent = `Capacity: ${config.capacity} • Click FREE dates (9AM-3PM) to book | Click 🔴 for event details`;
 
   let calendar;
 
   const calendarEl = document.getElementById('calendar');
   
-  // 🔥 INIT CALENDAR FIRST - NO TIME DISPLAY
+  // 🔥 TIME SLOTS (9AM-3PM)
+  const timeSlots = [
+    '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', 
+    '01:00 PM', '02:00 PM', '03:00 PM'
+  ];
+  
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
     height: "auto",
@@ -305,18 +379,137 @@ document.addEventListener('DOMContentLoaded', function () {
       center: 'title',
       right: 'dayGridMonth,dayGridWeek'
     },
-    timeZone: 'UTC', // 🔥 FIX TIME BUG
-    eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false }, // 🔥 HIDE TIME
-    dayMaxEvents: 3,
-    eventClick: function(info) {
-  const eventName = info.event.title;
+    timeZone: 'UTC',
+    dayMaxEvents: 0, // 🔥 HIDE EVENT COUNT
+    dayPopoverFormat: { month: 'long', day: 'numeric', year: 'numeric' },
+    dateClick: function(info) {
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const clickedDate = new Date(info.dateStr);
+      clickedDate.setHours(0,0,0,0);
+
+      if (clickedDate < today) {
+        alert("❌ Cannot book past dates");
+        return;
+      }
+
+      // 🔥 CHECK IF ANY EVENTS ON THIS DATE
+      const eventsOnDate = calendar.getEvents().filter(e =>
+        e.start.toDateString() === clickedDate.toDateString()
+      );
+
+      if (eventsOnDate.length > 0) {
+        // 🔥 SHOW MODAL WITH ALL EVENTS
+        showEventsModal(info.dateStr, eventsOnDate);
+        return;
+      }
+
+      // 🔥 FREE DATE - GO TO BOOKING
+      const formattedDate = info.dateStr.replace(/-/g, '/');
+      window.location.href = `registration.html?hall=${encodeURIComponent(hallName)}&date=${formattedDate}`;
+    },
+    eventDidMount: function(info) {
+      // 🔥 HIDE ALL EVENT VISUALS - ONLY RED DOT
+      info.el.style.display = 'none';
+      info.el.parentElement.classList.add('has-events');
+    }
+  });
+
+  calendar.render();
+
+  // 🔥 LOAD EVENTS & ADD RED DOTS
+  const q = query(collection(db, "bookings"), where("hall", "==", hallName));
   
-  // 🔥 FIX AM/PM - WORKS WITH ANY FORMAT
-  let startTime = info.event.extendedProps.time || info.event.extendedProps.startTime || "All Day";
-  let endTime = info.event.extendedProps.endTime || "";
-  
-  // 🔥 CONVERT TO PROPER AM/PM
-  const formatTime = (timeStr) => {
+  onSnapshot(q, (snapshot) => {
+    calendar.removeAllEvents();
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (!data.date || !data.eventName || !data.startTime) return;
+
+      let eventDate = new Date(data.date.replace(/\//g, '-'));
+      if (isNaN(eventDate)) return;
+
+      calendar.addEvent({
+        id: doc.id,
+        title: data.eventName,
+        start: eventDate,
+        display: 'none', // 🔥 HIDE EVENT
+        extendedProps: {
+          startTime: data.startTime,
+          endTime: data.endTime || data.startTime
+        }
+      });
+    });
+
+    // 🔥 ADD has-events CLASS TO DAYS WITH EVENTS
+    updateDayIndicators();
+  });
+
+  // 🔥 UPDATE DAY INDICATORS (RED DOTS)
+  function updateDayIndicators() {
+    document.querySelectorAll('.fc-daygrid-day').forEach(dayEl => {
+      const dateStr = dayEl.getAttribute('data-date');
+      const events = calendar.getEvents().filter(e => 
+        new Date(e.start).toDateString() === new Date(dateStr).toDateString()
+      );
+      
+      if (events.length > 0) {
+        dayEl.classList.add('has-events');
+      } else {
+        dayEl.classList.remove('has-events');
+      }
+    });
+  }
+
+  // 🔥 EVENTS MODAL
+  const modal = document.getElementById('eventsModal');
+  const closeBtn = document.getElementById('closeModal');
+  const modalTitle = document.getElementById('modalDateTitle');
+  const modalBody = document.getElementById('modalBody');
+
+  function showEventsModal(dateStr, events) {
+    const date = new Date(dateStr);
+    modalTitle.textContent = date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    if (events.length === 0) {
+      modalBody.innerHTML = `
+        <div class="no-events">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">No events</h3>
+          <p class="text-sm">This date is completely free!</p>
+        </div>
+      `;
+    } else {
+      modalBody.innerHTML = events.map(event => {
+        const startTime = formatTime(event.extendedProps.startTime);
+        const endTime = formatTime(event.extendedProps.endTime);
+        const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
+        
+        return `
+          <div class="event-item">
+            <div class="event-time">${timeRange}</div>
+            <h3 class="event-name">${event.title}</h3>
+            <div class="event-status">
+              <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+              Booked • ${timeSlots.includes(startTime) ? '9AM-3PM slot' : 'Custom time'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    modal.style.display = 'block';
+  }
+
+  function formatTime(timeStr) {
     if (!timeStr || timeStr.includes('AM') || timeStr.includes('PM')) return timeStr;
     
     try {
@@ -331,76 +524,19 @@ document.addEventListener('DOMContentLoaded', function () {
     } catch(e) {
       return timeStr;
     }
-  };
-  
-  startTime = formatTime(startTime);
-  endTime = formatTime(endTime);
-  
-  const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
-  
-  alert(`🔴 BOOKED\n\n📋 Event: ${eventName}\n🕐 Time: ${timeRange}`);
-},
-    dateClick: function(info) {
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      const clickedDate = new Date(info.dateStr);
-      clickedDate.setHours(0,0,0,0);
-
-      if (clickedDate < today) {
-        alert("❌ Cannot book past dates");
-        return;
-      }
-
-      const eventsOnDate = calendar.getEvents().filter(e =>
-        e.start.toDateString() === clickedDate.toDateString()
-      );
-
-      if (eventsOnDate.length > 0) {
-        alert("🔴 Already booked! Click event for details.");
-        return;
-      }
-
-      const formattedDate = info.dateStr.replace(/-/g, '/');
-      window.location.href = `registration.html?hall=${encodeURIComponent(hallName)}&date=${formattedDate}`;
-    },
-    eventDidMount: function(info) {
-      // 🔥 NUKE ANY TIME DISPLAY
-      const timeEl = info.el.querySelector('.fc-event-time');
-      if (timeEl) timeEl.remove();
-      
-      info.el.style.cursor = 'pointer';
-      info.el.title = info.event.title;
-    }
-  });
-
-  calendar.render();
-
-  // 🔥 LOAD EVENTS AFTER CALENDAR RENDERS
-  const q = query(collection(db, "bookings"), where("hall", "==", hallName));
-  
-  onSnapshot(q, (snapshot) => {
-    calendar.removeAllEvents();
-
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      if (!data.date || !data.eventName) return;
-
-      let eventDate = new Date(data.date.replace(/\//g, '-'));
-      if (isNaN(eventDate)) return;
-
-     calendar.addEvent({
-  id: doc.id,
-  title: data.eventName, // ✅ ONLY NAME
-  start: eventDate,
-  display: 'auto',
-  extendedProps: {
-    time: data.startTime || "All Day",     // 🔥 ADD THIS LINE
-    startTime: data.startTime || "All Day",
-    endTime: data.endTime || ""
   }
-});
-  
-    });
+
+  // 🔥 MODAL CLOSE HANDLERS
+  closeBtn.onclick = () => modal.style.display = 'none';
+  window.onclick = (event) => {
+    if (event.target === modal) modal.style.display = 'none';
+  };
+
+  // 🔥 ESC KEY CLOSE
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.style.display === 'block') {
+      modal.style.display = 'none';
+    }
   });
 });
 </script>
