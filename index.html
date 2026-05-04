@@ -300,20 +300,36 @@
 </footer>
 
 <script>
-  // Mobile menu toggle
+  // Mobile menu toggle - FIXED
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const mobileMenu = document.getElementById('mobileMenu');
   
   mobileMenuBtn.addEventListener('click', () => {
-    mobileMenu.classList.toggle('opacity-100');
-    mobileMenu.classList.toggle('invisible');
+    if (mobileMenu.classList.contains('opacity-100')) {
+      // Menu is open, close it
+      mobileMenu.classList.remove('opacity-100');
+      mobileMenu.classList.add('opacity-0', 'invisible');
+    } else {
+      // Menu is closed, open it
+      mobileMenu.classList.remove('opacity-0', 'invisible');
+      mobileMenu.classList.add('opacity-100');
+    }
   });
 
   // Close mobile menu on link click
   document.querySelectorAll('#mobileMenu a').forEach(link => {
     link.addEventListener('click', () => {
+      mobileMenu.classList.remove('opacity-100');
       mobileMenu.classList.add('opacity-0', 'invisible');
     });
+  });
+
+  // Close mobile menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+      mobileMenu.classList.remove('opacity-100');
+      mobileMenu.classList.add('opacity-0', 'invisible');
+    }
   });
 
   // Smooth scroll for anchor links
@@ -327,6 +343,5 @@
     });
   });
 </script>
-
 </body>
 </html>
