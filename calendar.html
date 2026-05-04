@@ -208,8 +208,8 @@ body { font-family: 'Inter', sans-serif; }
     <a href="index.html#availability" class="text-sm text-green-600 hover:text-green-700 font-medium mb-2 inline-block transition-colors flex items-center gap-1">
       ← Back to Halls
     </a>
-    <h2 class="text-2xl font-semibold" id="hallTitle">Seminar Hall 1</h2>
-    <p class="text-gray-500 text-sm mt-1" id="hallInfo">Capacity: 80 seats • Click FREE dates to book | Click BOOKED events to view details</p>
+    <h2 class="text-2xl font-semibold" id="hallTitle">Deickmann Hall</h2>
+    <p class="text-gray-500 text-sm mt-1" id="hallInfo">Capacity: 200 seats • Click FREE dates to book | Click BOOKED events to view details</p>
     <div class="flex gap-3 mt-4">
       <span class="px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs flex items-center gap-1">+ Available</span>
       <span class="px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs flex items-center gap-1">🔴 Booked</span>
@@ -255,17 +255,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
   hallName = decodeURIComponent(hallName).trim();
 
-  const validHalls = ["Seminar Hall 1", "Seminar Hall 2", "Main Auditorium"];
+  // 🔥 UPDATED HALL NAMES & CAPACITIES
+  const validHalls = ["Deickmann Hall", "Gnanamma Hall", "St.Joseph's auditorium"];
   if (!validHalls.includes(hallName)) {
     alert("❌ Invalid hall.");
     window.location.href = "index.html#availability";
     return;
   }
 
+  // 🔥 UPDATED HALL CONFIG WITH NEW CAPACITIES
   const hallConfig = {
-    "Seminar Hall 1": { capacity: "80 seats", emoji: "📚" },
-    "Seminar Hall 2": { capacity: "80 seats", emoji: "📖" },
-    "Main Auditorium": { capacity: "300 seats", emoji: "🎭" }
+    "Deickmann Hall": { capacity: "200 seats", emoji: "📚" },
+    "Gnanamma Hall": { capacity: "200 seats", emoji: "📖" },
+    "St.Joseph's auditorium": { capacity: "800 seats", emoji: "🎭" }
   };
 
   const config = hallConfig[hallName];
