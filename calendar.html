@@ -62,10 +62,8 @@ body { font-family: 'Inter', sans-serif; }
   margin: 2px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  overflow: hidden;
-  height: 100px;
+  overflow: visible;
   padding-bottom: 8px;
-  cursor: pointer;
 }
 .fc-daygrid-day:hover {
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -97,7 +95,7 @@ body { font-family: 'Inter', sans-serif; }
   z-index: 3;
   line-height: 1;
 }
-.fc-daygrid-day-past { background: #f8fafc; opacity: 0.6; cursor: not-allowed; }
+.fc-daygrid-day-past { background: #f8fafc; opacity: 0.6; }
 .fc-day-today {
   background: transparent !important;
   position: relative;
@@ -119,44 +117,79 @@ body { font-family: 'Inter', sans-serif; }
   margin: 4px auto 0;
   box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
 }
-/* 🔥 FIXED RED DOT FOR DATES WITH EVENTS */
-.fc-daygrid-day:has(.fc-daygrid-event):after,
-.fc-daygrid-day[data-events="true"]:after {
+.has-events::after {
   content: '';
   position: absolute;
   top: 8px;
   right: 8px;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   background: #ef4444;
   border: 2px solid #ffffff;
   border-radius: 50%;
   box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
   z-index: 10;
   animation: pulse 2s infinite;
-  pointer-events: none;
-}
-.fc-daygrid-day:hover:has(.fc-daygrid-event):after,
-.fc-daygrid-day:hover[data-events="true"]:after {
-  transform: scale(1.2);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6);
 }
 @keyframes pulse {
   0% { box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4); }
   50% { box-shadow: 0 2px 12px rgba(239, 68, 68, 0.7); }
   100% { box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4); }
 }
-/* 🔥 HIDE EVENTS - ONLY SHOW RED DOT */
 .fc-event { 
+  display: none !important; 
+  cursor: pointer !important;
+}
+.fc-scrollgrid { border: none !important; }
+.fc-daygrid-event {
+  display: block !important;
+  font-size: 11px !important;
+  padding: 2px 6px !important;
+  margin: 1px !important;
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: calc(100% - 4px) !important;
+}
+.fc-daygrid-event:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5) !important;
+}
+  /* 🔥 PERMANENTLY KILL 5:30 TIME BUG */
+.fc-event-time { 
   display: none !important; 
   visibility: hidden !important; 
   font-size: 0 !important; 
   height: 0 !important; 
   width: 0 !important; 
   opacity: 0 !important; 
-  position: absolute;
 }
-.fc-scrollgrid { border: none !important; }
+
+.fc-event-title-container .fc-event-title {
+  display: block !important;
+}
+
+.fc-daygrid-event .fc-event-main {
+  padding: 2px 6px !important;
+  font-size: 11px !important;
+}
+
+/* Kill any time display completely */
+.fc-event-main-frame {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.fc-event-title {
+  margin: 0 !important;
+  line-height: 1.2 !important;
+}
 </style>
 </head>
 
@@ -164,6 +197,7 @@ body { font-family: 'Inter', sans-serif; }
 <!-- HEADER -->
 <header class="bg-white border-b px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
   <a href="index.html#home" class="flex items-center gap-3 hover:scale-105 transition-transform">
+    <!-- 🔥 ACTUAL LOGO IMAGE INSTEAD OF COLORED DIV -->
     <img src="https://ik.imagekit.io/syustaging/SYU_PREPROD/LOGO_Zd7PFpkXn.webp?tr=w-3840" 
          alt="CampusHalls Logo" 
          class="w-10 h-10 rounded-xl shadow-lg object-cover"
@@ -183,10 +217,10 @@ body { font-family: 'Inter', sans-serif; }
       ← Back to Halls
     </a>
     <h2 class="text-2xl font-semibold" id="hallTitle">Deickmann Hall</h2>
-    <p class="text-gray-500 text-sm mt-1" id="hallInfo">Capacity: 200 seats • Click FREE dates to book | RED DOT = Fully Booked</p>
+    <p class="text-gray-500 text-sm mt-1" id="hallInfo">Capacity: 200 seats • Click FREE dates to book | Click BOOKED events to view details</p>
     <div class="flex gap-3 mt-4">
       <span class="px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs flex items-center gap-1">+ Available</span>
-      <span class="px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs flex items-center gap-1">🔴 Fully Booked</span>
+      <span class="px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs flex items-center gap-1">🔴 Booked</span>
     </div>
   </div>
 
@@ -195,27 +229,28 @@ body { font-family: 'Inter', sans-serif; }
   </div>
 </div>
 
-<!-- FOOTER - WHITE BACKGROUND FOR LOGO VISIBILITY -->
-<footer class="bg-white text-gray-800 border-t shadow-lg py-8 mt-20">
+<!-- FOOTER -->
+<footer class="bg-gradient-to-r from-green-500 to-teal-500 text-white text-center py-8 mt-20">
     <div class="max-w-4xl mx-auto px-4">
       <div class="flex justify-center items-center gap-3 mb-4">
         <div class="footer-logo">
           <img src="https://ik.imagekit.io/syustaging/SYU_PREPROD/LOGO_Zd7PFpkXn.webp?tr=w-3840" 
                alt="St.Anns Logo" 
-               class="w-12 h-12 rounded-2xl shadow-lg object-cover bg-white p-1">
+               class="w-12 h-12 rounded-2xl shadow-lg object-cover bg-white p-1"
+               loading="lazy">
         </div>
-        <h3 class="font-bold text-2xl text-gray-900">St.Anns Halls</h3>
+        <h3 class="font-bold text-2xl">St.Anns Halls</h3>
       </div>
-      <p class="text-sm text-gray-600">© 2026 St.Anns Halls. All rights reserved.</p>
+      <p class="text-sm opacity-90">© 2026 St.Anns Halls. All rights reserved.</p>
     </div>
-</footer>
+  </footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
+  apiKey: "AIzaSyA1VE0YP88fk7tJ-NynBt_A0dNnoMyVi44",
   authDomain: "hall-booking-de99d.firebaseapp.com",
   projectId: "hall-booking-de99d",
   storageBucket: "hall-booking-de99d.firebasestorage.app",
@@ -227,75 +262,146 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 document.addEventListener('DOMContentLoaded', function () {
-
   const urlParams = new URLSearchParams(window.location.search);
-  let hallName = decodeURIComponent(urlParams.get('hall') || "").trim();
+  let hallName = urlParams.get('hall');
 
   if (!hallName) {
-    alert("No hall selected");
+    alert("❌ No hall selected.");
     window.location.href = "index.html#availability";
     return;
   }
 
-  const calendarEl = document.getElementById('calendar');
+  hallName = decodeURIComponent(hallName).trim();
 
-  const calendar = new FullCalendar.Calendar(calendarEl, {
+  // 🔥 UPDATED HALL NAMES & CAPACITIES
+  const validHalls = ["Deickmann Hall", "Gnanamma Hall", "St.Joseph's Auditorium"];
+  if (!validHalls.includes(hallName)) {
+    alert("❌ Invalid hall.");
+    window.location.href = "index.html#availability";
+    return;
+  }
+
+  // 🔥 UPDATED HALL CONFIG WITH NEW CAPACITIES
+  const hallConfig = {
+    "Deickmann Hall": { capacity: "200 seats", emoji: "📚" },
+    "Gnanamma Hall": { capacity: "200 seats", emoji: "📖" },
+    "St.Joseph's Auditorium": { capacity: "800 seats", emoji: "🎭" }
+  };
+
+  const config = hallConfig[hallName];
+  document.getElementById('hallTitle').textContent = `${config.emoji} ${hallName}`;
+  document.getElementById('hallInfo').textContent = `Capacity: ${config.capacity} • Click FREE dates to book | Click BOOKED events to view details`;
+
+  let calendar;
+
+  const calendarEl = document.getElementById('calendar');
+  
+  // 🔥 INIT CALENDAR FIRST - NO TIME DISPLAY
+  calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
     height: "auto",
-
-    dateClick: function(info) {
-      const clickedDate = info.dateStr;
-
-      const events = calendar.getEvents().filter(e =>
-        e.startStr.startsWith(clickedDate)
-      );
-
-      if (events.length > 0) {
-        let msg = `🔴 Booked (9AM–3PM):\n\n`;
-        events.forEach(e => msg += `• ${e.title}\n`);
-        alert(msg);
-      } else {
-        // simple availability
-        window.location.href = `registration.html?hall=${encodeURIComponent(hallName)}&date=${clickedDate}`;
-      }
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,dayGridWeek'
     },
+    timeZone: 'UTC', // 🔥 FIX TIME BUG
+    eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false }, // 🔥 HIDE TIME
+    dayMaxEvents: 3,
+    eventClick: function(info) {
+  const eventName = info.event.title;
+  
+  // 🔥 FIX AM/PM - WORKS WITH ANY FORMAT
+  let startTime = info.event.extendedProps.time || info.event.extendedProps.startTime || "All Day";
+  let endTime = info.event.extendedProps.endTime || "";
+  
+  // 🔥 CONVERT TO PROPER AM/PM
+  const formatTime = (timeStr) => {
+    if (!timeStr || timeStr.includes('AM') || timeStr.includes('PM')) return timeStr;
+    
+    try {
+      const [hours, minutes] = timeStr.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours), parseInt(minutes) || 0, 0, 0);
+      return date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit', 
+        hour12: true 
+      });
+    } catch(e) {
+      return timeStr;
+    }
+  };
+  
+  startTime = formatTime(startTime);
+  endTime = formatTime(endTime);
+  
+  const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
+  
+  alert(`🔴 BOOKED\n\n📋 Event: ${eventName}\n🕐 Time: ${timeRange}`);
+},
+    dateClick: function(info) {
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const clickedDate = new Date(info.dateStr);
+      clickedDate.setHours(0,0,0,0);
 
-    dayCellDidMount: function(info) {
-      const dateStr = info.date.toISOString().split('T')[0];
+      if (clickedDate < today) {
+        alert("❌ Cannot book past dates");
+        return;
+      }
 
-      const events = calendar.getEvents().filter(e =>
-        e.startStr.startsWith(dateStr)
+      const eventsOnDate = calendar.getEvents().filter(e =>
+        e.start.toDateString() === clickedDate.toDateString()
       );
 
-      if (events.length > 0) {
-        info.el.classList.add('has-events'); // 🔴 RED DOT WORKS NOW
+      if (eventsOnDate.length > 0) {
+        alert("🔴 Already booked! Click event for details.");
+        return;
       }
+
+      const formattedDate = info.dateStr.replace(/-/g, '/');
+      window.location.href = `registration.html?hall=${encodeURIComponent(hallName)}&date=${formattedDate}`;
+    },
+    eventDidMount: function(info) {
+      // 🔥 NUKE ANY TIME DISPLAY
+      const timeEl = info.el.querySelector('.fc-event-time');
+      if (timeEl) timeEl.remove();
+      
+      info.el.style.cursor = 'pointer';
+      info.el.title = info.event.title;
     }
   });
 
   calendar.render();
 
+  // 🔥 LOAD EVENTS AFTER CALENDAR RENDERS
   const q = query(collection(db, "bookings"), where("hall", "==", hallName));
-
+  
   onSnapshot(q, (snapshot) => {
     calendar.removeAllEvents();
 
     snapshot.forEach((doc) => {
       const data = doc.data();
-
       if (!data.date || !data.eventName) return;
 
-      const formattedDate = data.date.replace(/\//g, '-');
+      let eventDate = new Date(data.date.replace(/\//g, '-'));
+      if (isNaN(eventDate)) return;
 
-      calendar.addEvent({
-        title: data.eventName,
-        start: formattedDate
-      });
+     calendar.addEvent({
+  id: doc.id,
+  title: data.eventName, // ✅ ONLY NAME
+  start: eventDate,
+  display: 'auto',
+  extendedProps: {
+    time: data.startTime || "All Day",     // 🔥 ADD THIS LINE
+    startTime: data.startTime || "All Day",
+    endTime: data.endTime || ""
+  }
+});
+  
     });
-
-    calendar.render(); // 🔥 IMPORTANT: re-render to update red dots
   });
-
 });
 </script>
 </body>
