@@ -119,8 +119,9 @@ body { font-family: 'Inter', sans-serif; }
   margin: 4px auto 0;
   box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
 }
-/* 🔥 RED DOT FOR ANY EVENTS - CLICKABLE */
-.has-events::after {
+/* 🔥 FIXED RED DOT FOR DATES WITH EVENTS */
+.fc-daygrid-day:has(.fc-daygrid-event):after,
+.fc-daygrid-day[data-events="true"]:after {
   content: '';
   position: absolute;
   top: 8px;
@@ -133,10 +134,10 @@ body { font-family: 'Inter', sans-serif; }
   box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
   z-index: 10;
   animation: pulse 2s infinite;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  pointer-events: none;
 }
-.has-events:hover::after {
+.fc-daygrid-day:hover:has(.fc-daygrid-event):after,
+.fc-daygrid-day:hover[data-events="true"]:after {
   transform: scale(1.2);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.6);
 }
@@ -145,38 +146,17 @@ body { font-family: 'Inter', sans-serif; }
   50% { box-shadow: 0 2px 12px rgba(239, 68, 68, 0.7); }
   100% { box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4); }
 }
-/* 🔥 HIDE EVENTS - ONLY SHOW DOT */
-.fc-event { display: none !important; }
-.fc-scrollgrid { border: none !important; }
-.fc-event-time { 
+/* 🔥 HIDE EVENTS - ONLY SHOW RED DOT */
+.fc-event { 
   display: none !important; 
   visibility: hidden !important; 
   font-size: 0 !important; 
   height: 0 !important; 
   width: 0 !important; 
   opacity: 0 !important; 
-}
-/* Tooltip for booked dates */
-.fc-daygrid-day:has(.has-events)::before {
-  content: attr(data-tooltip);
   position: absolute;
-  bottom: -35px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #ef4444;
-  color: white;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 20;
-  transition: opacity 0.3s ease;
 }
-.fc-daygrid-day:has(.has-events):hover::before {
-  opacity: 1;
-}
+.fc-scrollgrid { border: none !important; }
 </style>
 </head>
 
@@ -203,10 +183,10 @@ body { font-family: 'Inter', sans-serif; }
       ← Back to Halls
     </a>
     <h2 class="text-2xl font-semibold" id="hallTitle">Deickmann Hall</h2>
-    <p class="text-gray-500 text-sm mt-1" id="hallInfo">Capacity: 200 seats • Click FREE dates to book | Click 🔴 RED DOT for slot details (9AM-3PM)</p>
+    <p class="text-gray-500 text-sm mt-1" id="hallInfo">Capacity: 200 seats • Click FREE dates to book | RED DOT = Fully Booked</p>
     <div class="flex gap-3 mt-4">
       <span class="px-3 py-1 rounded-full bg-green-100 text-green-600 text-xs flex items-center gap-1">+ Available</span>
-      <span class="px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs flex items-center gap-1">🔴 Click Red Dot</span>
+      <span class="px-3 py-1 rounded-full bg-red-100 text-red-600 text-xs flex items-center gap-1">🔴 Fully Booked</span>
     </div>
   </div>
 
@@ -215,21 +195,22 @@ body { font-family: 'Inter', sans-serif; }
   </div>
 </div>
 
-<!-- FOOTER -->
-<footer class="bg-gradient-to-r from-green-500 to-teal-500 text-white text-center py-8 mt-20">
+<!-- FOOTER - WHITE BACKGROUND FOR LOGO VISIBILITY -->
+<footer class="bg-white text-gray-800 border-t shadow-lg py-8 mt-20">
     <div class="max-w-4xl mx-auto px-4">
       <div class="flex justify-center items-center gap-3 mb-4">
         <div class="footer-logo">
           <img src="https://ik.imagekit.io/syustaging/SYU_PREPROD/LOGO_Zd7PFpkXn.webp?tr=w-3840" 
                alt="St.Anns Logo" 
-               class="w-12 h-12 rounded-2xl shadow-lg object-cover"
+               class="w-12 h-12 rounded-2xl shadow-lg object-cover bg-white p-2"
                loading="lazy">
         </div>
-        <h3 class="font-bold text-2xl">St.Anns Halls</h3>
+        <h3 class="font-bold text-2xl text-gray-900">St.Anns Halls</h3>
       </div>
-      <p class="text-sm opacity-90">© 2026 St.Anns Halls. All rights reserved.</p>
+      <p class="text-sm text-gray-600">© 2026 St.Anns Halls. All rights reserved.</p>
     </div>
-  </footer>
+</footer>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -245,14 +226,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-// 🔥 TIME SLOTS (9AM-3PM)
-const TIME_SLOTS = [
-  { start: '9:00 AM', end: '10:30 AM' },
-  { start: '10:30 AM', end: '12:00 PM' },
-  { start: '12:00 PM', end: '1:30 PM' },
-  { start: '1:30 PM', end: '3:00 PM' }
-];
 
 document.addEventListener('DOMContentLoaded', function () {
   const urlParams = new URLSearchParams(window.location.search);
@@ -281,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const config = hallConfig[hallName];
   document.getElementById('hallTitle').textContent = `${config.emoji} ${hallName}`;
-  document.getElementById('hallInfo').textContent = `Capacity: ${config.capacity} • Click FREE dates to book | Click 🔴 RED DOT for slot details (9AM-3PM)`;
+  document.getElementById('hallInfo').textContent = `Capacity: ${config.capacity} • Click FREE dates to book | RED DOT = Fully Booked`;
 
   let calendar;
 
@@ -296,14 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
       right: 'dayGridMonth,dayGridWeek'
     },
     timeZone: 'UTC',
-    eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
-    dayMaxEvents: 99, // Allow all events
-    dayPopoverFormat: { month: 'long', day: 'numeric', year: 'numeric' },
-    eventDidMount: function(info) {
-      // Hide all events - we only show red dot
-      info.el.style.display = 'none';
-      info.el.title = info.event.title;
-    },
+    dayMaxEvents: 99,
     dateClick: function(info) {
       const today = new Date();
       today.setHours(0,0,0,0);
@@ -315,19 +281,29 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      // Get all events for this date
+      // Check if date has any events (booked)
       const eventsOnDate = calendar.getEvents().filter(e =>
         e.start.toDateString() === clickedDate.toDateString()
       );
 
       if (eventsOnDate.length > 0) {
-        showSlotDetails(clickedDate, eventsOnDate, hallName);
+        alert("❌ This date is fully booked!");
         return;
       }
 
-      // No events = fully available
+      // No events = fully available - go to booking
       const formattedDate = info.dateStr.replace(/-/g, '/');
       window.location.href = `registration.html?hall=${encodeURIComponent(hallName)}&date=${formattedDate}`;
+    },
+    dayRender: function(info) {
+      // Mark days with events for red dot
+      const eventsOnDate = calendar.getEvents().filter(e =>
+        e.start.toDateString() === info.date.toDateString()
+      );
+      if (eventsOnDate.length > 0) {
+        info.el.dataset.events = "true";
+        info.el.classList.add('has-events');
+      }
     }
   });
 
@@ -340,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     snapshot.forEach((doc) => {
       const data = doc.data();
-      if (!data.date || !data.eventName || !data.startTime) return;
+      if (!data.date || !data.eventName) return;
 
       let eventDate = new Date(data.date.replace(/\//g, '-'));
       if (isNaN(eventDate)) return;
@@ -349,94 +325,14 @@ document.addEventListener('DOMContentLoaded', function () {
         id: doc.id,
         title: data.eventName,
         start: eventDate,
-        display: 'auto',
-        extendedProps: {
-          time: `${data.startTime} - ${data.endTime || '3PM'}`,
-          startTime: data.startTime,
-          endTime: data.endTime
-        }
+        display: 'background' // Use background events to trigger has-events
       });
     });
-  });
 
-  // 🔥 Add click listener for red dots
-  document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('fc-daygrid-day') && e.target.classList.contains('has-events')) {
-      e.stopPropagation();
-      const dateStr = e.target.querySelector('.fc-daygrid-day-frame')?.dataset.date;
-      if (dateStr) {
-        const clickedDate = new Date(dateStr);
-        const eventsOnDate = calendar.getEvents().filter(event =>
-          event.start.toDateString() === clickedDate.toDateString()
-        );
-        showSlotDetails(clickedDate, eventsOnDate, hallName);
-      }
-    }
+    // Re-render to update dayRender
+    calendar.refetchEvents();
   });
 });
-
-// 🔥 SHOW DETAILED SLOT INFORMATION
-function showSlotDetails(date, eventsOnDate, hallName) {
-  const dateStr = date.toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
-  
-  let bookedSlots = [];
-  eventsOnDate.forEach(event => {
-    bookedSlots.push({
-      time: event.extendedProps.time || `${event.extendedProps.startTime} - ${event.extendedProps.endTime}`,
-      name: event.title
-    });
-  });
-
-  let availableSlots = TIME_SLOTS.filter(slot => {
-    return !bookedSlots.some(booking => 
-      booking.time.includes(slot.start.split(' ')[0]) || 
-      booking.time.includes(slot.start)
-    );
-  });
-
-  let message = `📅 ${dateStr}\n\n`;
-  
-  if (bookedSlots.length > 0) {
-    message += `🔴 BOOKED SLOTS (${bookedSlots.length}/4):\n`;
-    bookedSlots.forEach((booking, index) => {
-      message += `• ${booking.time} - ${booking.name}\n`;
-    });
-    message += `\n`;
-  }
-
-  if (availableSlots.length > 0) {
-    message += `✅ AVAILABLE SLOTS (${availableSlots.length}/4):\n`;
-    availableSlots.forEach(slot => {
-      message += `• ${slot.start} - ${slot.end}\n`;
-    });
-  } else {
-    message += `❌ No available slots today (9AM-3PM)`;
-  }
-
-  message += `\n\nBook available slot?`;
-
-  if (confirm(message)) {
-    if (availableSlots.length > 0) {
-      // Show slot selection dialog
-      let slotChoice = prompt(`Select available slot (enter number):\n\n` + 
-        availableSlots.map((slot, i) => `${i+1}. ${slot.start} - ${slot.end}`).join('\n') +
-        `\n\nEnter slot number (1-${availableSlots.length}):`);
-      
-      if (slotChoice && !isNaN(slotChoice) && slotChoice >= 1 && slotChoice <= availableSlots.length) {
-        const selectedSlot = availableSlots[parseInt(slotChoice) - 1];
-        const formattedDate = date.toLocaleDateString('en-US').replace(/,/g, '');
-        window.location.href = `registration.html?hall=${encodeURIComponent(hallName)}&date=${formattedDate}&slot=${encodeURIComponent(selectedSlot.start)}`;
-      }
-    } else {
-      alert("No available slots today!");
-    }
-  }
-}
 </script>
 </body>
 </html>
