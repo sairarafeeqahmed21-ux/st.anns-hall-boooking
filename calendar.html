@@ -117,7 +117,7 @@ body { font-family: 'Inter', sans-serif; }
   box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
 }
 
-/* 🔥 FIXED RED DOT POSITION - NEVER COVERS DATE */
+/* 🔥 FIXED RED DOT - NEVER COVERS DATE NUMBER */
 .has-events .fc-daygrid-day-top::after {
   content: '';
   position: absolute;
@@ -133,7 +133,6 @@ body { font-family: 'Inter', sans-serif; }
   animation: pulse 2s infinite;
 }
 
-/* 🔥 MULTIPLE EVENTS INDICATOR */
 .has-multiple-events .fc-daygrid-day-top::after {
   width: 16px !important;
   height: 16px !important;
@@ -153,7 +152,7 @@ body { font-family: 'Inter', sans-serif; }
   display: none !important;
 }
 
-/* 🔥 MODAL STYLES */
+/* 🔥 MODAL STYLES - SIMPLE EVENT LIST */
 .booking-modal {
   display: none;
   position: fixed;
@@ -229,16 +228,6 @@ body { font-family: 'Inter', sans-serif; }
   transform: translateY(-1px);
   box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
 }
-.event-item.free {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border-color: #bbf7d0;
-}
-.event-item.free .event-time {
-  color: #166534;
-}
-.event-item.free .event-status span {
-  background-color: #10b981;
-}
 .event-time {
   font-size: 18px;
   font-weight: 700;
@@ -307,7 +296,7 @@ body { font-family: 'Inter', sans-serif; }
   </div>
 </div>
 
-<!-- 🔥 EVENTS MODAL -->
+<!-- 🔥 EVENTS MODAL - JUST SHOW EVENTS -->
 <div id="eventsModal" class="booking-modal">
   <div class="modal-content">
     <div class="modal-header">
@@ -385,12 +374,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const calendarEl = document.getElementById('calendar');
   
-  // 🔥 TIME SLOTS (9AM-3PM)
-  const timeSlots = [
-    '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', 
-    '01:00 PM', '02:00 PM', '03:00 PM'
-  ];
-  
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
     height: "auto",
@@ -400,7 +383,7 @@ document.addEventListener('DOMContentLoaded', function () {
       right: 'dayGridMonth,dayGridWeek'
     },
     timeZone: 'UTC',
-    dayMaxEvents: 0, // 🔥 HIDE EVENT COUNT
+    dayMaxEvents: 0,
     dayPopoverFormat: { month: 'long', day: 'numeric', year: 'numeric' },
     dateClick: function(info) {
       const today = new Date();
@@ -413,23 +396,12 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      // 🔥 CHECK IF ANY EVENTS ON THIS DATE
-      const eventsOnDate = calendar.getEvents().filter(e =>
-        e.start.toDateString() === clickedDate.toDateString()
-      );
-
-      if (eventsOnDate.length > 0) {
-        // 🔥 SHOW MODAL WITH ALL EVENTS + AVAILABLE SLOTS
-        showEventsModal(info.dateStr, eventsOnDate, timeSlots);
-        return;
-      }
-
-      // 🔥 FREE DATE - GO TO BOOKING
+      // 🔥 ALWAYS GO TO BOOKING PAGE - EVEN IF HAS EVENTS
+      // User can book remaining time slots in registration page
       const formattedDate = info.dateStr.replace(/-/g, '/');
       window.location.href = `registration.html?hall=${encodeURIComponent(hallName)}&date=${formattedDate}`;
     },
     eventDidMount: function(info) {
-      // 🔥 HIDE ALL EVENT VISUALS - ONLY RED DOT
       info.el.style.display = 'none';
     }
   });
@@ -453,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function () {
         id: doc.id,
         title: data.eventName,
         start: eventDate,
-        display: 'none', // 🔥 HIDE EVENT
+        display: 'none',
         extendedProps: {
           startTime: data.startTime,
           endTime: data.endTime || data.startTime
@@ -461,7 +433,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
 
-    // 🔥 ADD has-events CLASS TO DAYS WITH EVENTS
     updateDayIndicators();
   });
 
@@ -484,93 +455,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // 🔥 EVENTS MODAL WITH MULTIPLE SLOTS
+  // 🔥 EVENTS MODAL - SIMPLIFIED (Just show events, no extra logic)
   const modal = document.getElementById('eventsModal');
   const closeBtn = document.getElementById('closeModal');
   const modalTitle = document.getElementById('modalDateTitle');
   const modalBody = document.getElementById('modalBody');
 
-  function showEventsModal(dateStr, bookedEvents, availableSlots) {
-    const date = new Date(dateStr);
-    modalTitle.textContent = date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-
-    // Get booked slot times
-    const bookedTimes = bookedEvents.map(event => event.extendedProps.startTime).sort();
-    
-    // Find available slots
-    const available = availableSlots.filter(slot => !bookedTimes.includes(slot));
-
-    let html = '';
-
-    // Show booked events first
-    if (bookedEvents.length > 0) {
-      html += bookedEvents.map(event => {
-        const startTime = formatTime(event.extendedProps.startTime);
-        const endTime = formatTime(event.extendedProps.endTime);
-        const timeRange = endTime ? `${startTime} - ${endTime}` : startTime;
-        
-        return `
-          <div class="event-item">
-            <div class="event-time">${timeRange}</div>
-            <h3 class="event-name">${event.title}</h3>
-            <div class="event-status">
-              <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-              Booked • ${availableSlots.includes(event.extendedProps.startTime) ? '9AM-3PM slot' : 'Custom time'}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // Show available slots
-    if (available.length > 0) {
-      html += `
-        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
-          <h4 style="font-size: 18px; font-weight: 700; color: #166534; margin-bottom: 16px;">
-            ✅ Available Slots (Click to Book)
-          </h4>
-      `;
-
-      available.forEach(slot => {
-        html += `
-          <div class="event-item free" style="cursor: pointer;" onclick="bookSlot('${dateStr.replace(/-/g, '/')}','${slot}')">
-            <div class="event-time">${slot}</div>
-            <h3 class="event-name">Free Slot</h3>
-            <div class="event-status">
-              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-              Available • 9AM-3PM
-            </div>
-          </div>
-        `;
-      });
-
-      html += `</div>`;
-    } else if (bookedEvents.length === 0) {
-      html = `
-        <div class="no-events">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-          </svg>
-          <h3 class="text-lg font-semibold text-gray-900 mb-2">Completely Free!</h3>
-          <p class="text-sm">Click any available slot above to book.</p>
-        </div>
-      `;
-    }
-
-    modalBody.innerHTML = html;
-    modal.style.display = 'block';
-  }
-
-  // 🔥 BOOK SLOT FUNCTION (Global for onclick)
-  window.bookSlot = function(date, slot) {
-    const hallNameEncoded = encodeURIComponent(hallName);
-    window.location.href = `registration.html?hall=${hallNameEncoded}&date=${date}&slot=${encodeURIComponent(slot)}`;
-  };
+  // 🔥 MODAL IS NOT USED ANYMORE - BUT KEPT FOR RED DOT VISUAL
+  // dateClick now goes directly to booking page always
 
   function formatTime(timeStr) {
     if (!timeStr || timeStr.includes('AM') || timeStr.includes('PM')) return timeStr;
@@ -589,13 +481,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // 🔥 MODAL CLOSE HANDLERS
+  // 🔥 MODAL CLOSE HANDLERS (KEPT FOR CLEANUP)
   closeBtn.onclick = () => modal.style.display = 'none';
   window.onclick = (event) => {
     if (event.target === modal) modal.style.display = 'none';
   };
 
-  // 🔥 ESC KEY CLOSE
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modal.style.display === 'block') {
       modal.style.display = 'none';
