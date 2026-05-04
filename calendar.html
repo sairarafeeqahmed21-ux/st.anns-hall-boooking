@@ -157,6 +157,35 @@ body { font-family: 'Inter', sans-serif; }
   transform: scale(1.05) !important;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5) !important;
 }
+  /* 🔥 PERMANENTLY KILL 5:30 TIME BUG */
+.fc-event-time { 
+  display: none !important; 
+  visibility: hidden !important; 
+  font-size: 0 !important; 
+  height: 0 !important; 
+  width: 0 !important; 
+  opacity: 0 !important; 
+}
+
+.fc-event-title-container .fc-event-title {
+  display: block !important;
+}
+
+.fc-daygrid-event .fc-event-main {
+  padding: 2px 6px !important;
+  font-size: 11px !important;
+}
+
+/* Kill any time display completely */
+.fc-event-main-frame {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.fc-event-title {
+  margin: 0 !important;
+  line-height: 1.2 !important;
+}
 </style>
 </head>
 
@@ -215,32 +244,24 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 document.addEventListener('DOMContentLoaded', function () {
-
-  // ✅ GET HALL FROM URL (STRICT)
   const urlParams = new URLSearchParams(window.location.search);
   let hallName = urlParams.get('hall');
 
   if (!hallName) {
-    alert("❌ No hall selected. Go back and choose again.");
+    alert("❌ No hall selected.");
     window.location.href = "index.html#availability";
-    throw new Error("Missing hall");
+    return;
   }
 
   hallName = decodeURIComponent(hallName).trim();
 
-  const validHalls = [
-    "Seminar Hall 1",
-    "Seminar Hall 2",
-    "Main Auditorium"
-  ];
-
+  const validHalls = ["Seminar Hall 1", "Seminar Hall 2", "Main Auditorium"];
   if (!validHalls.includes(hallName)) {
-    alert("❌ Invalid hall selected.");
+    alert("❌ Invalid hall.");
     window.location.href = "index.html#availability";
-    throw new Error("Invalid hall");
+    return;
   }
 
-  // ✅ UI CONFIG
   const hallConfig = {
     "Seminar Hall 1": { capacity: "80 seats", emoji: "📚" },
     "Seminar Hall 2": { capacity: "80 seats", emoji: "📖" },
@@ -248,79 +269,25 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   const config = hallConfig[hallName];
-
   document.getElementById('hallTitle').textContent = `${config.emoji} ${hallName}`;
-  document.getElementById('hallInfo').textContent =
-    `Capacity: ${config.capacity} • Click FREE dates to book | Click BOOKED events to view details`;
+  document.getElementById('hallInfo').textContent = `Capacity: ${config.capacity} • Click FREE dates to book | Click BOOKED events to view details`;
 
-  let calendarEvents = [];
   let calendar;
 
-  // ✅ FIREBASE QUERY - FIXED TIME & NO "5 NUMBERS"
-  const q = query(
-    collection(db, "bookings"),
-    where("hall", "==", hallName)
-  );
-
-  onSnapshot(q, (snapshot) => {
-    calendarEvents = [];
-
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-
-      if (!data.date || !data.eventName) return;
-
-      let eventDate;
-
-      if (typeof data.date === "string") {
-        eventDate = new Date(data.date.replace(/\//g, '-'));
-      } else if (data.date?.toDate) {
-        eventDate = data.date.toDate();
-      }
-
-      if (!isNaN(eventDate)) {
-        // ✅ CLEAN TIME FORMAT (AM/PM from registration)
-        const startTime = data.startTime || "All Day";
-        const endTime = data.endTime || "";
-
-        calendarEvents.push({
-          id: doc.id,
-          title: data.eventName, // ✅ ONLY EVENT NAME ON CALENDAR
-          start: eventDate,
-          display: 'block', // ✅ Force display
-          extendedProps: {
-            startTime: startTime, // ✅ Exact time from registration (10:00 AM)
-            endTime: endTime,
-            organizer: data.fullName || "Unknown"
-          }
-        });
-      }
-    });
-
-    console.log(`📊 ${calendarEvents.length} events loaded for ${hallName}`);
-
-    if (calendar) {
-      calendar.removeAllEvents();
-      calendar.addEventSource(calendarEvents);
-    }
-  });
-
-  // ✅ INIT CALENDAR - PERMANENTLY FIXED
   const calendarEl = document.getElementById('calendar');
-
+  
+  // 🔥 INIT CALENDAR FIRST - NO TIME DISPLAY
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
     height: "auto",
-
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
       right: 'dayGridMonth,dayGridWeek'
     },
-
-    events: calendarEvents,
-
-    // ✅ PERFECT EVENT CLICK - EVENT NAME + AM/PM TIME
+    timeZone: 'UTC', // 🔥 FIX TIME BUG
+    eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false }, // 🔥 HIDE TIME
+    dayMaxEvents: 3,
     eventClick: function(info) {
       const eventName = info.event.title;
       const startTime = info.event.extendedProps.startTime || "All Day";
@@ -329,12 +296,9 @@ document.addEventListener('DOMContentLoaded', function () {
       
       alert(`🔴 BOOKED\n\n📋 Event: ${eventName}\n🕐 Time: ${timeRange}`);
     },
-
-    // ✅ CLICK FREE DATE TO BOOK
     dateClick: function(info) {
       const today = new Date();
       today.setHours(0,0,0,0);
-
       const clickedDate = new Date(info.dateStr);
       clickedDate.setHours(0,0,0,0);
 
@@ -348,31 +312,50 @@ document.addEventListener('DOMContentLoaded', function () {
       );
 
       if (eventsOnDate.length > 0) {
-        alert("🔴 This date is already booked!\n\nClick the red event to see details.");
+        alert("🔴 Already booked! Click event for details.");
         return;
       }
 
       const formattedDate = info.dateStr.replace(/-/g, '/');
-
-      window.location.href =
-        `registration.html?hall=${encodeURIComponent(hallName)}&date=${formattedDate}`;
+      window.location.href = `registration.html?hall=${encodeURIComponent(hallName)}&date=${formattedDate}`;
     },
-
     eventDidMount: function(info) {
-      // ✅ PERFECT EVENT STYLING - NO "5 NUMBERS"
-      info.el.style.cursor = 'pointer';
-      info.el.style.display = 'block';
-      info.el.title = `${info.event.title}`;
+      // 🔥 NUKE ANY TIME DISPLAY
+      const timeEl = info.el.querySelector('.fc-event-time');
+      if (timeEl) timeEl.remove();
       
-      // ✅ Force clean display - remove any time text
-      const eventElements = info.el.querySelectorAll('.fc-event-title');
-      eventElements.forEach(el => {
-        el.textContent = info.event.title;
-      });
+      info.el.style.cursor = 'pointer';
+      info.el.title = info.event.title;
     }
   });
 
   calendar.render();
+
+  // 🔥 LOAD EVENTS AFTER CALENDAR RENDERS
+  const q = query(collection(db, "bookings"), where("hall", "==", hallName));
+  
+  onSnapshot(q, (snapshot) => {
+    calendar.removeAllEvents();
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (!data.date || !data.eventName) return;
+
+      let eventDate = new Date(data.date.replace(/\//g, '-'));
+      if (isNaN(eventDate)) return;
+
+      calendar.addEvent({
+        id: doc.id,
+        title: data.eventName, // ✅ ONLY NAME
+        start: eventDate,
+        display: 'auto',
+        extendedProps: {
+          startTime: data.startTime || "All Day",
+          endTime: data.endTime || ""
+        }
+      });
+    });
+  });
 });
 </script>
 </body>
